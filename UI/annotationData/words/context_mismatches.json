@@ -1,0 +1,14 @@
+[
+  {
+    "context": "Finn the racer had a sturdy red car that purred with power.",
+    "missing": [
+      "Finn the dancer had a sturdy red car that purred with power."
+    ]
+  },
+  {
+    "context": "\"Hi, Dawn!\" hooted Dale,",
+    "missing": [
+      "\"Hi, Dawn!\" hooted Dale,\"Want to leap and play?\""
+    ]
+  }
+]
