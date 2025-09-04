@@ -7,7 +7,7 @@ scripts/3.error_label_classification_w2v.py
 scripts/4.asr_random_partition.py
 scripts/5.asr_train_w2v.py
 scripts/6.asr_eval_w2v.py
-scripts/as.py
+scripts/asr.py
 scripts/audio_utils.py
 scripts/install_dependencies.sh
 scripts/kenlm.py
