@@ -1,7 +1,6 @@
 misc
 .DS_Store
 scripts/__pycache__
-scripts/1.word_annotation_processing.py
 scripts/3.error_category_classification_w2v.py
 scripts/3.error_label_classification_w2v.py
 scripts/4.asr_random_partition.py
