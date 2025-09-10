@@ -3,9 +3,11 @@ import os
 from pathlib import Path
 ONEDRIVE_DIR = Path("~/OneDrive/").expanduser() # can also use "/Users/liu.ying/University of Florida/"; please don't put random hardcoded paths in the middle of the script; you can put them at the bottom or top to make it easier for other people to use
 PROJECT_SUBDIR = "Leite,Walter's files - Storiza Corpus Spring 2025"
+UTTERANCES_SUBDIR = "Individual utterances"
 SESSION_SUBDIR = "Storiza_Participant_Recording_05-30-25"
 
 # Base folders
+BUFFERED_UTTERANCES_SUBDIR = os.path.join(ONEDRIVE_DIR, PROJECT_SUBDIR, UTTERANCES_SUBDIR, "audio_clips")
 AUDIO_BASE_DIR = os.path.join(ONEDRIVE_DIR, PROJECT_SUBDIR, SESSION_SUBDIR)
 PROCESSED_UTTERANCE_DIR = os.path.join(ONEDRIVE_DIR, PROJECT_SUBDIR,"Processed_Utterances")
 ROOT_DIR = os.path.join("..", "..")  # repo root (relative to this script)

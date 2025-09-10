@@ -9,9 +9,11 @@ def build_segments_and_rows(
     SENTENCE_SEGMENTS_DIR,
     WORD_SEGMENTS_DIR,
     WORD_SEGMENTS_NGRAM_DIR,
+    BUFFERED_UTTERANCES_SUBDIR,
     sentenceLabels_original_audio_timestamps,
     NGRAM,
     error_dict,
+    sample_rate=4800,
     debug=False
 ):
     """
@@ -119,15 +121,7 @@ def build_segments_and_rows(
             # Keep as-is to match original behavior
             pass
 
-        # Outputting sentence-level segments
-        audio_file = os.path.join(audio_base_dir, original_audio_name)
-        audio_data = AudioSegment.from_file(audio_file)
 
-        utterance_output_filename = ''
-        if utterance_start_time is not None and utterance_end_time is not None and sentence_level_id is not None:
-            sentence_segment = audio_data[utterance_start_time * 1000 : utterance_end_time * 1000]
-            utterance_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment.wav"
-            sentence_segment.export(os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename), format='wav')
 
         # Use the latest annotation block
         result = annotations[0].get("result", [])
@@ -241,7 +235,6 @@ def build_segments_and_rows(
         word_segments = []
         for word_id, info in grouped.items():
             if (
-                utterance_output_filename != '' and
                 info['error_labels'] != ["Unfilled Pause"] and
                 info['start'] is not None and
                 info['end'] is not None and
@@ -305,20 +298,22 @@ def build_segments_and_rows(
         # Collecting sentence-level segments and transcripts
         produced_utterance = []
 
+
+        website_prefix='https://2025storiza.michaelbennie.org/audio_clips/'
+        actual_buffered__audio_file_name = item.get("data", {}).get("audio")
         # Collecting word-level segments and transcripts
-        if utterance_output_filename != '':
-            sentence_audio_file = os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename)
-            sentence_audio_data, sample_rate = sf.read(sentence_audio_file)
+        if actual_buffered__audio_file_name != '':
+            buffered_audio_file_full_path=os.path.join(BUFFERED_UTTERANCES_SUBDIR,actual_buffered__audio_file_name[len(website_prefix):])
+
+            sentence_audio_data, sample_rate = sf.read(buffered_audio_file_full_path)
             start_time_list = []
             end_time_list = []
             first_word_start_time = 0
             for z in range(len(sorted_word_segments)):
                 info = sorted_word_segments[z]
                 if info['start'] is not None and info['end'] is not None and sentence_level_id is not None:
-                    if z == 0:
-                        first_word_start_time = info['start']
-                    start_time = info['start'] - first_word_start_time
-                    end_time = info['end'] - first_word_start_time
+                    start_time = info['start']
+                    end_time = info['end']
                     start_time_list.append(start_time)
                     end_time_list.append(end_time)
                     actual_production = info['actual_production']
@@ -337,8 +332,9 @@ def build_segments_and_rows(
                     word_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_word_segment_{z+1}.wav"
                     sf.write(os.path.join(WORD_SEGMENTS_DIR, word_output_filename), word_segment, sample_rate)
 
-                    # DEBUG file (kept as-is)
-                    sf.write('test.wav', sentence_audio_data[0: int(round(1.1024390243902435*sample_rate))], sample_rate)
+                    if debug:
+                        # DEBUG file (kept as-is)
+                        sf.write('test.wav', sentence_audio_data[0: int(round(1.1024390243902435*sample_rate))], sample_rate)
 
                     word_segments_path_list.append(os.path.join(WORD_SEGMENTS_DIR, word_output_filename))
                     word_segments_transcript_list.append(actual_production)
@@ -373,6 +369,52 @@ def build_segments_and_rows(
                     sf.write(os.path.join(WORD_SEGMENTS_NGRAM_DIR, ngram_output_filename), ngram_segment, sample_rate)
                     word_segments_ngram_path_list.append(os.path.join(WORD_SEGMENTS_NGRAM_DIR, ngram_output_filename))
                     word_segments_ngram_transcript_list.append(ngram_produced_utterance)
+
+        # Outputting sentence-level segments
+        audio_file = os.path.join(audio_base_dir, original_audio_name) #WHAT????
+        audio_data = AudioSegment.from_file(audio_file)
+
+        # ---- compute sentence window from word spans (+/- 10 ms), clamped ----
+        buffer_s = 0.010  # 10 ms
+
+        # Load original audio once to get duration (and later to export the sentence clip)
+        audio_file = os.path.join(audio_base_dir, original_audio_name)
+        audio_data = AudioSegment.from_file(audio_file)
+        audio_duration_s = audio_data.duration_seconds
+
+        # Get all valid starts/ends from the current item
+        valid_starts = [w["start"] for w in sorted_word_segments if w["start"] is not None]
+        valid_ends = [w["end"] for w in sorted_word_segments if w["end"] is not None]
+
+        if valid_starts and valid_ends:
+            # derive window with buffer and clamp to [0, audio_duration]
+            derived_start = max(0.0, min(valid_starts) - buffer_s)
+            derived_end = min(audio_duration_s, max(valid_ends) + buffer_s)
+
+            # Guard against weird cases (e.g., end <= start)
+            if derived_end <= derived_start:
+                # Fallback to no-buffer bounds
+                derived_start = max(0.0, min(valid_starts))
+                derived_end = min(audio_duration_s, max(valid_ends))
+
+            utterance_start_time = derived_start
+            utterance_end_time = derived_end
+        else:
+            # If no valid word times, skip sentence export for this item
+            utterance_start_time = None
+            utterance_end_time = None
+
+        # ---- export the sentence clip using the derived window ----
+        utterance_output_filename = ''
+        if (
+                utterance_start_time is not None
+                and utterance_end_time is not None
+                and sentence_level_id is not None
+        ):
+            sentence_segment = audio_data[int(utterance_start_time * 1000): int(utterance_end_time * 1000)]
+            utterance_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment.wav"
+            sentence_clip_path = os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename)
+            sentence_segment.export(sentence_clip_path, format='wav')
 
         if produced_utterance != []:
             sentence_segments_path_list.append(os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename))

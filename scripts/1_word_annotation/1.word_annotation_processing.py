@@ -25,7 +25,7 @@ from jsonHelpers import *
 from dataHelpers import *
 
 # ---- Processing parameters ----
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 4800
 NGRAM = "full"  # or an int (e.g., 3) if you want fixed-length n-grams
 DEBUG = True #used to print additional data
 
@@ -53,7 +53,8 @@ if DEBUG:
 
 
 #============= (2) Generate Data DICTs================
-sentenceLabels_original_audio_timestamps = load_sentence_label_timestamps(SENTENCE_LABELS_CSV)
+sentenceLabels_original_audio_timestamps = load_sentence_label_timestamps(SENTENCE_LABELS_CSV) #WTW why do we even need this? we can just directly use the audio timestamps
+
 
 if DEBUG:
 
@@ -130,9 +131,11 @@ for annotator in ANNOTATOR_LIST:
     SENTENCE_SEGMENTS_DIR=SENTENCE_SEGMENTS_DIR,
     WORD_SEGMENTS_DIR=WORD_SEGMENTS_DIR,
     WORD_SEGMENTS_NGRAM_DIR=WORD_SEGMENTS_NGRAM_DIR,
+    BUFFERED_UTTERANCES_SUBDIR=BUFFERED_UTTERANCES_SUBDIR,
     sentenceLabels_original_audio_timestamps=sentenceLabels_original_audio_timestamps,
     NGRAM=NGRAM,
     error_dict=error_dict,  # can be a defaultdict(list) or a seeded dict
+    sample_rate=SAMPLE_RATE,
     debug=DEBUG
 )
 
@@ -179,7 +182,7 @@ word_segments_data_ngram.to_csv(WORD_LEVEL_NGRAM_CSV, index=False, encoding="utf
 # -------- Write Full word-level data --------
 task_intended_words_dict = {}
 
-with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f:
+with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f: #bruh, 400 lines
     writer = csv.DictWriter(f, fieldnames=["task_id", "annotator", "start", "end", "intended_words", "produced_word", "IPA", "error_category", "error_labels", "comments", "goldStandard", "original_audio_name", "actual_production"])
     writer.writeheader()
     for row in rows:   
@@ -451,7 +454,10 @@ with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f:
 
 print(f"✅ Done! Output saved to: {FORMATTED_FULL_CSV}")
 
+exit()
+# IDK what is happening here
 for annotator in ANNOTATOR_LIST:
+    #I DONT HAVE THESE FILES :((((((((((((((((((((((((((((
   with open('../fixes/' + ANNOTATOR_MAP[annotator] + '_fixes.txt', 'w') as f:
     annotation_errors = error_dict[annotator]
     try:
