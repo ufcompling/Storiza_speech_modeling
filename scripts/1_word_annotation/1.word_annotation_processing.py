@@ -73,15 +73,8 @@ story_audio_produced_sentences = defaultdict(list)
 
 # Story-level data
 story_data = pd.DataFrame(columns=['Path', 'Transcript', 'goldStandard'])
-story_data_path_list = []
-story_data_transcript_list = []
-story_data_goldstandard_list = []
-
 # Sentence-level data
 sentence_segments_data = pd.DataFrame(columns=['Path', 'Transcript', 'goldStandard']) 
-sentence_segments_path_list = []
-sentence_segments_transcript_list = []
-sentence_segments_goldstandard_list = []
 
 
 try:
@@ -92,13 +85,6 @@ except OSError as e:
 
 # Unigram word-level data
 word_segments_data = pd.DataFrame(columns=['Path', 'Transcript', 'Intended Words', 'Produced Words', 'IPA', 'Error Category', 'Error Labels'])
-word_segments_path_list = []
-word_segments_transcript_list = []
-word_segments_intended_words_list = []
-word_segments_produced_words_list = []
-word_segments_IPA_list = []
-word_segments_error_category_list = []
-word_segments_error_labels_list = []
 try:
     os.makedirs(WORD_SEGMENTS_DIR, exist_ok=True)
     print(f"Directory '{WORD_SEGMENTS_DIR}' created or already exists.")
@@ -107,8 +93,6 @@ except OSError as e:
 
 # N-gram word-level data, taking context into account when doing classification later
 word_segments_data_ngram = pd.DataFrame(columns=['Path', 'Transcript', 'Intended Words', 'Produced Words', 'IPA', 'Error Category', 'Error Labels'])
-word_segments_ngram_path_list = []
-word_segments_ngram_transcript_list = []
 try:
     os.makedirs(WORD_SEGMENTS_NGRAM_DIR, exist_ok=True)
     print(f"Directory '{WORD_SEGMENTS_NGRAM_DIR}' created or already exists.")
@@ -121,45 +105,57 @@ error_dict = {}
 for annotator in ANNOTATOR_LIST:
   error_dict[annotator] = []
 #============= (4) Extract & Format Data================
-audio_dict = {} ## For comparing cross-annotations later
 
-
-proccessed_task_data = process_tasks(
+(
+    audio_dict,
+    story_audio_goldstandard_sentences,
+    story_audio_produced_sentences,
+    rows,
+    sentence_segments_path_list,
+    sentence_segments_transcript_list,
+    sentence_segments_goldstandard_list,
+    word_segments_path_list,
+    word_segments_transcript_list,
+    word_segments_intended_words_list,
+    word_segments_produced_words_list,
+    word_segments_IPA_list,
+    word_segments_error_category_list,
+    word_segments_error_labels_list,
+    word_segments_ngram_path_list,
+    word_segments_ngram_transcript_list,
+    error_dict,
+) = build_segments_and_rows(
     data=data,
-    sentence_timestamps=sentenceLabels_original_audio_timestamps,
     audio_base_dir=AUDIO_BASE_DIR,
-    sentence_segments_dir=SENTENCE_SEGMENTS_DIR,
-    word_segments_dir=WORD_SEGMENTS_DIR,
-    word_segments_ngram_dir=WORD_SEGMENTS_NGRAM_DIR,
-    ngram=NGRAM,              # e.g., "full" or 3
-    error_dict=None,          # or a pre-seeded defaultdict(list)
+    SENTENCE_SEGMENTS_DIR=SENTENCE_SEGMENTS_DIR,
+    WORD_SEGMENTS_DIR=WORD_SEGMENTS_DIR,
+    WORD_SEGMENTS_NGRAM_DIR=WORD_SEGMENTS_NGRAM_DIR,
+    sentenceLabels_original_audio_timestamps=sentenceLabels_original_audio_timestamps,
+    NGRAM=NGRAM,
+    error_dict=error_dict,  # can be a defaultdict(list) or a seeded dict
+    debug=DEBUG
 )
-
-rows = proccessed_task_data["rows"]
-errors = proccessed_task_data["errors"]
-sentence_segments = proccessed_task_data["sentence_segments"]
-word_segments = proccessed_task_data["word_segments"]
-ngram_segments = proccessed_task_data["ngram_segments"]
-story_gold = proccessed_task_data["story_audio_goldstandard_sentences"]
-story_prod = proccessed_task_data["story_audio_produced_sentences"]
 
 
 # Generating story-level datasets for modeling
+story_data_path_list=[]
+story_data_goldstandard_list=[]
+story_data_transcript_list=[]
 for audio, sentences in story_audio_goldstandard_sentences.items():
-   story_data_path_list.append('/Users/liu.ying/University of Florida/Leite,Walter - Storiza Corpus Spring 2025/Storiza_Participant_Recording_05-30-25/' + audio)
+   story_data_path_list.append(os.path.join(AUDIO_BASE_DIR,audio))
    story_data_goldstandard_list.append(' '.join(sentences))
    story_data_transcript_list.append(' '.join(story_audio_produced_sentences[audio]))
 
 story_data['Path'] = story_data_path_list
 story_data['Transcript'] = story_data_transcript_list
 story_data['goldStandard'] = story_data_goldstandard_list
-story_data.to_csv('../processed_data/story_level_data.csv', index=False, encoding="utf-8")
+story_data.to_csv(STORY_LEVEL_CSV, index=False, encoding="utf-8")
 
 # Generating sentence-level datasets for modeling
 sentence_segments_data['Path'] = sentence_segments_path_list
 sentence_segments_data['Transcript'] = sentence_segments_transcript_list
 sentence_segments_data['goldStandard'] = sentence_segments_goldstandard_list
-sentence_segments_data.to_csv('../processed_data/sentence_level_data.csv', index=False, encoding="utf-8")
+sentence_segments_data.to_csv(SENTENCE_LEVEL_CSV, index=False, encoding="utf-8")
 
 # Generating word-level datasets for modeling
 word_segments_data['Path'] = word_segments_path_list
@@ -169,7 +165,7 @@ word_segments_data['Produced Words'] = word_segments_produced_words_list
 word_segments_data['IPA'] = word_segments_IPA_list
 word_segments_data['Error Category'] = word_segments_error_category_list
 word_segments_data['Error Labels'] = word_segments_error_labels_list
-word_segments_data.to_csv('../processed_data/word_level_data.csv', index=False, encoding="utf-8")
+word_segments_data.to_csv(WORD_LEVEL_CSV, index=False, encoding="utf-8")
 
 word_segments_data_ngram['Path'] = word_segments_ngram_path_list
 word_segments_data_ngram['Transcript'] = word_segments_ngram_transcript_list
@@ -178,13 +174,12 @@ word_segments_data_ngram['Produced Words'] = word_segments_produced_words_list
 word_segments_data_ngram['IPA'] = word_segments_IPA_list
 word_segments_data_ngram['Error Category'] = word_segments_error_category_list
 word_segments_data_ngram['Error Labels'] = word_segments_error_labels_list
-word_segments_data_ngram.to_csv('../processed_data/word_level_data_ngram.csv', index=False, encoding="utf-8")
+word_segments_data_ngram.to_csv(WORD_LEVEL_NGRAM_CSV, index=False, encoding="utf-8")
 
 # -------- Write Full word-level data --------
-csv_path = "../../processed_data/formatted_annotations_with_comments.csv"
 task_intended_words_dict = {}
 
-with open(csv_path, "w", newline="", encoding="utf-8") as f:
+with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f:
     writer = csv.DictWriter(f, fieldnames=["task_id", "annotator", "start", "end", "intended_words", "produced_word", "IPA", "error_category", "error_labels", "comments", "goldStandard", "original_audio_name", "actual_production"])
     writer.writeheader()
     for row in rows:   
@@ -454,10 +449,10 @@ with open(csv_path, "w", newline="", encoding="utf-8") as f:
           row['end'] = str(end)
           writer.writerow(row)
 
-print(f"✅ Done! Output saved to: {csv_path}")
+print(f"✅ Done! Output saved to: {FORMATTED_FULL_CSV}")
 
-for annotator in annotator_list:
-  with open('../fixes/' + annotator_map[annotator] + '_fixes.txt', 'w') as f:
+for annotator in ANNOTATOR_LIST:
+  with open('../fixes/' + ANNOTATOR_MAP[annotator] + '_fixes.txt', 'w') as f:
     annotation_errors = error_dict[annotator]
     try:
       sorted_annotation_errors = sorted(annotation_errors, key=lambda x: x[0])
@@ -482,7 +477,7 @@ for annotator in annotator_list:
 ### Checking cross-annotations; JSON file seems to only save the latest annotations (from two annotators)
 import pandas as pd
 
-csv_path = pd.read_csv("export_157618_project-157618-at-2025-08-04-03-01-f5029ec4.csv")
+csv_path = pd.read_csv(CROSS_ANNOT_CSV)
 word_annotation_list = csv_path['WordAnnotation'].tolist()
 id_list = csv_path['id'].tolist()
 id_annotations_dict = {}
