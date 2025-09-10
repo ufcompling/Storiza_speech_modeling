@@ -26,7 +26,7 @@ from jsonHelpers import *
 # ---- Processing parameters ----
 SAMPLE_RATE = 16000
 NGRAM = "full"  # or an int (e.g., 3) if you want fixed-length n-grams
-DEBUG = False #used to print additional data
+DEBUG = True #used to print additional data
 
 
 
@@ -54,21 +54,19 @@ if DEBUG:
 #============= (2) Generate Data DICTs================
 sentenceLabels_original_audio_timestamps = load_sentence_label_timestamps(SENTENCE_LABELS_CSV)
 
-#print out some examples:
-for item in sentenceLabels_original_audio_timestamps[:min(5, len(sentenceLabels_original_audio_timestamps))]:
-    print_structure_with_values(item)
+if DEBUG:
 
-#try specific example:
-try:
-    print(sentenceLabels_original_audio_timestamps[""])
-except KeyError:
-    print("item not found")
+    print_structure_with_values(list(sentenceLabels_original_audio_timestamps)[:min(5, len(sentenceLabels_original_audio_timestamps.keys()))])
 
-
-# In[23]:
+    #try specific example:
+    try:
+        print(sentenceLabels_original_audio_timestamps[""])
+    except KeyError:
+        print("item not found")
 
 
-# Collecting annotated intended/goldstandard sentences for each audio
+#============= (3) Collecting annotated intended/goldstandard sentences for each audio================
+
 story_audio_goldstandard_sentences = defaultdict(list)
 story_audio_produced_sentences = defaultdict(list)
 
@@ -83,12 +81,13 @@ sentence_segments_data = pd.DataFrame(columns=['Path', 'Transcript', 'goldStanda
 sentence_segments_path_list = []
 sentence_segments_transcript_list = []
 sentence_segments_goldstandard_list = []
-sentence_segments_path = '/Users/liu.ying/University of Florida/Leite,Walter - Storiza Corpus Spring 2025/Storiza_Participant_Recording_05-30-25/annotated_sentence_segments/'
+
+
 try:
-    os.makedirs(sentence_segments_path, exist_ok=True)
-    print(f"Directory '{sentence_segments_path}' created or already exists.")
+    os.makedirs(SENTENCE_SEGMENTS_DIR, exist_ok=True)
+    print(f"Directory '{SENTENCE_SEGMENTS_DIR}' created or already exists.")
 except OSError as e:
-    print(f"Error creating directory '{sentence_segments_path}': {e}")
+    print(f"Error creating directory '{SENTENCE_SEGMENTS_DIR}': {e}")
 
 # Unigram word-level data
 word_segments_data = pd.DataFrame(columns=['Path', 'Transcript', 'Intended Words', 'Produced Words', 'IPA', 'Error Category', 'Error Labels'])
@@ -99,32 +98,28 @@ word_segments_produced_words_list = []
 word_segments_IPA_list = []
 word_segments_error_category_list = []
 word_segments_error_labels_list = []
-word_segments_path = '/Users/liu.ying/University of Florida/Leite,Walter - Storiza Corpus Spring 2025/Storiza_Participant_Recording_05-30-25/annotated_word_segments/'
 try:
-    os.makedirs(word_segments_path, exist_ok=True)
-    print(f"Directory '{word_segments_path}' created or already exists.")
+    os.makedirs(WORD_SEGMENTS_DIR, exist_ok=True)
+    print(f"Directory '{WORD_SEGMENTS_DIR}' created or already exists.")
 except OSError as e:
-    print(f"Error creating directory '{word_segments_path}': {e}")
+    print(f"Error creating directory '{WORD_SEGMENTS_DIR}': {e}")
 
 # N-gram word-level data, taking context into account when doing classification later
-NGRAM = 'full'
 word_segments_data_ngram = pd.DataFrame(columns=['Path', 'Transcript', 'Intended Words', 'Produced Words', 'IPA', 'Error Category', 'Error Labels'])
 word_segments_ngram_path_list = []
 word_segments_ngram_transcript_list = []
-word_segments_ngram_path = '/Users/liu.ying/University of Florida/Leite,Walter - Storiza Corpus Spring 2025/Storiza_Participant_Recording_05-30-25/annotated_word_segments_ngram/'
 try:
-    os.makedirs(word_segments_ngram_path, exist_ok=True)
-    print(f"Directory '{word_segments_ngram_path}' created or already exists.")
+    os.makedirs(WORD_SEGMENTS_NGRAM_DIR, exist_ok=True)
+    print(f"Directory '{WORD_SEGMENTS_NGRAM_DIR}' created or already exists.")
 except OSError as e:
-    print(f"Error creating directory '{word_segments_ngram_path}': {e}")
+    print(f"Error creating directory '{WORD_SEGMENTS_NGRAM_DIR}': {e}")
 
 
 
 error_dict = {}
-for annotator in annotator_list:
+for annotator in ANNOTATOR_LIST:
   error_dict[annotator] = []
-
-# -------- Extract & Format Data --------
+#============= (4) Extract & Format Data================
 rows = []
 audio_dict = {} ## For comparing cross-annotations later
 
@@ -153,7 +148,6 @@ for item in data:
       story_audio_goldstandard_sentences[original_audio_name].append(goldStandard)
 
     sentence_level_id = item.get("data").get("sentence_level_id")
-    sample_rate = 16000
 
     repeated = item.get("data").get("repeated")
     if repeated:
@@ -185,8 +179,8 @@ for item in data:
       #Slice based on timestamps
       sentence_segment = audio_data[utterance_start_time * 1000:utterance_end_time*1000]
       utterance_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment.wav"
-#      sf.write(sentence_segments_path + utterance_output_filename, sentence_segment, sample_rate)
-      sentence_segment.export(sentence_segments_path + utterance_output_filename, format='wav')
+#      sf.write(SENTENCE_SEGMENTS_DIR + utterance_output_filename, sentence_segment, sample_rate)
+      sentence_segment.export(SENTENCE_SEGMENTS_DIR + utterance_output_filename, format='wav')
 
   #  result = []
   #  annotator = ''
@@ -380,7 +374,7 @@ for item in data:
 
     # Collecting word-level segments and transcripts
     if utterance_output_filename != '':
-      sentence_audio_file = sentence_segments_path + utterance_output_filename    
+      sentence_audio_file = SENTENCE_SEGMENTS_DIR + utterance_output_filename
       sentence_audio_data, sample_rate = sf.read(sentence_audio_file)
       start_time_list = []
       end_time_list = []
@@ -410,10 +404,10 @@ for item in data:
           # Slice directly by samples
           word_segment = sentence_audio_data[start_sample:end_sample, :] if sentence_audio_data.ndim > 1 else sentence_audio_data[start_sample:end_sample] # stereo or mono
           word_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_word_segment_{z+1}.wav"
-          sf.write(word_segments_path + word_output_filename, word_segment, sample_rate)
+          sf.write(WORD_SEGMENTS_DIR + word_output_filename, word_segment, sample_rate)
           sf.write('test.wav', sentence_audio_data[0: int(round(1.1024390243902435*sample_rate))], sample_rate)
 
-          word_segments_path_list.append(word_segments_path + word_output_filename)
+          word_segments_path_list.append(WORD_SEGMENTS_DIR + word_output_filename)
           word_segments_transcript_list.append(actual_production)
           word_segments_intended_words_list.append(info['intended_words'])
           word_segments_produced_words_list.append(info['produced_word'])
@@ -440,12 +434,12 @@ for item in data:
           ngram_end_sample = int(round(ngram_end_time * sample_rate))
           ngram_segment = sentence_audio_data[ngram_start_sample:ngram_end_sample, :] if sentence_audio_data.ndim > 1 else sentence_audio_data[ngram_start_sample:ngram_end_sample]
           ngram_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_ngram_segment_{z+1}.wav"
-          sf.write(word_segments_ngram_path + ngram_output_filename, ngram_segment, sample_rate)
-          word_segments_ngram_path_list.append(word_segments_ngram_path + ngram_output_filename)
+          sf.write(WORD_SEGMENTS_NGRAM_DIR + ngram_output_filename, ngram_segment, sample_rate)
+          word_segments_ngram_path_list.append(WORD_SEGMENTS_NGRAM_DIR + ngram_output_filename)
           word_segments_ngram_transcript_list.append(ngram_produced_utterance)
 
     if produced_utterance != []:
-      sentence_segments_path_list.append(sentence_segments_path + utterance_output_filename)
+      sentence_segments_path_list.append(SENTENCE_SEGMENTS_DIR + utterance_output_filename)
       sentence_segments_transcript_list.append(' '.join(produced_utterance))
       sentence_segments_goldstandard_list.append(goldStandard)
       if original_audio_name not in story_audio_produced_sentences:

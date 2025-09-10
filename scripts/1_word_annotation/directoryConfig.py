@@ -1,6 +1,6 @@
 # ---- Paths (edit these if your storage layout changes) ----
 import os
-ONEDRIVE_DIR = "/Users/liu.ying/University of Florida/"
+ONEDRIVE_DIR = "~/OneDrive/" # can also use "/Users/liu.ying/University of Florida/"; please don't put random hardcoded paths in the middle of the script; you can put them at the bottom or top to make it easier for other people to use
 PROJECT_SUBDIR = "Leite,Walter - Storiza Corpus Spring 2025"
 SESSION_SUBDIR = "Storiza_Participant_Recording_05-30-25"
 
