@@ -18,123 +18,51 @@ import pandas as pd
 from pydub import AudioSegment
 import soundfile as sf
 
-rootDir=".."
-onedrive_dir="/Users/liu.ying/University of Florida/"
-audio_base_dir=onedrive_dir+"Leite,Walter - Storiza Corpus Spring 2025/Storiza_Participant_Recording_05-30-25/"
-json_path = rootDir+"/processed_data/export_157618_project-157618-at-2025-09-01-21-16-2efa1216.json"
-with open(json_path, "r", encoding="utf-8") as f:
+
+from directoryConfig import  *
+from annotatorInformation import *
+from jsonHelpers import *
+
+# ---- Processing parameters ----
+SAMPLE_RATE = 16000
+NGRAM = "full"  # or an int (e.g., 3) if you want fixed-length n-grams
+DEBUG = False #used to print additional data
+
+
+
+# ----------- Load JSON ----------
+with open(JSON_PATH, "r", encoding="utf-8") as f:
     data = json.load(f)
 
+#============= (1) Examining JSON ================
+if DEBUG:
+    # ---------- Print First Example ----------
+    print("🔍 Structure with example values from first item:\n")
+    #print_structure_with_values(data[0])
+    for item in data:
+      task_id = item.get("id")
+      if task_id == 195798234:
+        print_structure_with_values(item)
 
-# In[18]:
-
-
-## Looking at the JSON format
-
-def print_structure_with_values(d, indent=0, max_string_length=80):
-    prefix = "  " * indent
-    if isinstance(d, dict):
-        for k, v in d.items():
-            if isinstance(v, (dict, list)):
-                print(f"{prefix}- {k}:")
-                print_structure_with_values(v, indent + 1)
-            else:
-                val_str = str(v)
-                if len(val_str) > max_string_length:
-                    val_str = val_str[:max_string_length] + "..."
-                print(f"{prefix}- {k}: {val_str}")
-    elif isinstance(d, list):
-        if not d:
-            print(f"{prefix}- []")
-        else:
-            for i, item in enumerate(d):
-                if isinstance(item, (dict, list)):
-                    print_structure_with_values(item, indent)
-                else:
-                    val_str = str(item)
-                    if len(val_str) > max_string_length:
-                        val_str = val_str[:max_string_length] + "..."
-                    print(f"{prefix}- [{i}]: {val_str}")
+    # ---------- Look At Annotation Types ----------
+    types, from_names, pairs = get_annotation_type_sets(data)
+    print(types)
+    print(from_names)
+    print(pairs)
 
 
-# ---------- Print First Example ----------
-print("🔍 Structure with example values from first item:\n")
-#print_structure_with_values(data[0])
-for item in data:
-  task_id = item.get("id")
-  if task_id == 195798234:
+#============= (2) Generate Data DICTs================
+sentenceLabels_original_audio_timestamps = load_sentence_label_timestamps(SENTENCE_LABELS_CSV)
+
+#print out some examples:
+for item in sentenceLabels_original_audio_timestamps[:min(5, len(sentenceLabels_original_audio_timestamps))]:
     print_structure_with_values(item)
 
-
-# In[19]:
-
-
-# Get different annotation types
-types = []
-from_names = []
-type_from_name_pairs = []
-for tok in data:
-#  print(len(tok.get('annotations'))) # 1
-  results = (tok.get('annotations')[0].get('result'))
-  for result in results:
-     result_type = result.get('type')
-     types.append(result_type)
-     from_name = result.get('from_name')
-     from_names.append(from_name)
-     type_from_name_pairs.append((result_type, from_name))
-
-print(set(types))
-print(set(from_names))
-for tok in set(type_from_name_pairs):
-  print(tok)
-
-
-# In[20]:
-
-
-## Doing checks and Output to CSV file
-import csv, os
-from collections import defaultdict
-from pydub import AudioSegment
-import soundfile as sf
-
-import string
-
-# Access the string containing punctuation characters
-punctuation_chars = string.punctuation
-
-
-# In[21]:
-
-
-sentenceLabels_data = pd.read_csv(rootDir+'/processed_data/sentenceLabels_with_comments.csv')
-annotated_intended_sentences_list = sentenceLabels_data['goldStandard'].tolist()
-original_audio_list = sentenceLabels_data['original_audio_name'].tolist()
-sentenceLabels_start_time_list = sentenceLabels_data['start_time'].tolist()
-sentenceLabels_end_time_list = sentenceLabels_data['end_time'].tolist()
-repeated_list = sentenceLabels_data['repeated'].tolist()
-
-
-# In[22]:
-
-
-## Rely on the sentenceLabels_with_comments.csv file to get start and end time; there is mismatch with the times in the json file
-sentenceLabels_original_audio_timestamps = {}
-for i in range(len(original_audio_list)):
-    original_audio = original_audio_list[i]
-    if not pd.isna(original_audio):
-        start_time = sentenceLabels_start_time_list[i]
-        end_time = sentenceLabels_end_time_list[i]
-        repeated = repeated_list[i]
-        if repeated:
-            repeated = 'true'
-        else:
-            repeated = 'false'
-        goldStandard = annotated_intended_sentences_list[i]
-        if 'Want to leap and play' in goldStandard:
-            goldStandard = "\"Hi, Dawn!\" hooted Dale,\"Want to leap and play?\""
-        identifier = original_audio + ' ' + goldStandard + ' ' + repeated
-        sentenceLabels_original_audio_timestamps[identifier] = [start_time, end_time]
+#try specific example:
+try:
+    print(sentenceLabels_original_audio_timestamps[""])
+except KeyError:
+    print("item not found")
 
 
 # In[23]:
@@ -190,35 +118,7 @@ try:
 except OSError as e:
     print(f"Error creating directory '{word_segments_ngram_path}': {e}")
 
-annotator_list = [
-  "rose.m@ufl.edu",
-  "emilianapulido@ufl.edu",
-  "lamanjennifer@ufl.edu",
-  "evanhalperin@ufl.edu",
-  "claire.kuntz@ufl.edu",
-  "ghineae@ufl.edu",
-  "hamern@ufl.edu",
-  "katherine.ball@ufl.edu",
-  "benjaminmcneill@ufl.edu",
-  "landonturner@ufl.edu",
-  "isabelapizarro@ufl.edu",
-  "landonturnr@gmail.com"
-]
 
-annotator_map = {
-  "rose.m@ufl.edu": "Maddie",
-  "emilianapulido@ufl.edu": "Emi",
-  "lamanjennifer@ufl.edu": "Jen",
-  "evanhalperin@ufl.edu": "Evan",
-  "claire.kuntz@ufl.edu": "Claire",
-  "ghineae@ufl.edu": "Elizabeth",
-  "hamern@ufl.edu": "Noah",
-  "katherine.ball@ufl.edu": "Katherine",
-  "benjaminmcneill@ufl.edu": "Benji",
-  "landonturner@ufl.edu": "Landon",
-  "isabelapizarro@ufl.edu": "Isabela",
-  "landonturnr@gmail.com": "Landon"
-}
 
 error_dict = {}
 for annotator in annotator_list:
