@@ -27,7 +27,7 @@ from dataHelpers import *
 # ---- Processing parameters ----
 SAMPLE_RATE = 4800
 NGRAM = "full"  # or an int (e.g., 3) if you want fixed-length n-grams
-DEBUG = True #used to print additional data
+DEBUG = False #used to print additional data
 
 
 
