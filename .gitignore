@@ -1,4 +1,5 @@
 misc
+processed_audio
 .DS_Store
 scripts/__pycache__
 scripts/3.error_category_classification_w2v.py
@@ -12,6 +13,21 @@ scripts/install_dependencies.sh
 scripts/kenlm.py
 scripts/misc
 scripts/storiza
+error_category_test_predictions_w2vlarge.csv
+scripts/0_sentence_annotation_checks/
+scripts/1_word_annotation.zip
+scripts/3.error_category_classification_binary.py
+scripts/3.error_category_classification_w2v.ipynb
+scripts/5.asr_train_w2v.ipynb
+scripts/asr_fancier.py
+scripts/asr_fancy.py
+scripts/clean_word_leveL_data.py
+scripts/clean_word_level_data.ipynb
+scripts/error_category_classification_binary.py
+scripts/install_conda_phi4.sh
+scripts/phi4-asr.ipynb
+scripts/problem_files.txt
+scripts/vocab.json
 fixes/
 # Byte-compiled / optimized / DLL files
 __pycache__/

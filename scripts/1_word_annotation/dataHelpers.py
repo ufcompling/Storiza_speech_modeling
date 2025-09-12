@@ -458,6 +458,8 @@ def build_segments_and_rows(
                 word_segments_ngram_transcript_list.append(ngram_produced_utterance)
 
         # If no pre-computed utterance window, derive from word spans and export
+    #    if (utterance_start_time is None and
+    #        utterance_end_time is None sentence_level_id is not None):
         if sentence_level_id is not None:
             dstart, dend = derive_sentence_window_from_words(sorted_word_segments, audio_duration_s, buffer_s=0.010)
             if dstart is not None and dend is not None:

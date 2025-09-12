@@ -458,7 +458,8 @@ exit()
 # IDK what is happening here
 for annotator in ANNOTATOR_LIST:
     #I DONT HAVE THESE FILES :((((((((((((((((((((((((((((
-  with open('../fixes/' + ANNOTATOR_MAP[annotator] + '_fixes.txt', 'w') as f:
+  with open(FIXES_DIR + ANNOTATOR_MAP[annotator] + '_fixes.txt', 'w') as f:
+    print(FIXES_DIR + ANNOTATOR_MAP[annotator] + '_fixes.txt',)
     annotation_errors = error_dict[annotator]
     try:
       sorted_annotation_errors = sorted(annotation_errors, key=lambda x: x[0])
@@ -471,13 +472,6 @@ for annotator in ANNOTATOR_LIST:
   f.close()
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
 
 
 ### Checking cross-annotations; JSON file seems to only save the latest annotations (from two annotators)
