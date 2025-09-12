@@ -401,8 +401,9 @@ def build_segments_and_rows(
         produced_utterance: List[str] = []
         actual_buffered_audio_url = item.get("data", {}).get("audio", '')
 
+        relative_start = max(0, utterance_start_time - word_offset)
         if actual_buffered_audio_url:
-            relative_start = max(0, utterance_start_time - word_offset)
+
 
             start_time_list: List[float] = []
             end_time_list: List[float] = []
@@ -461,13 +462,18 @@ def build_segments_and_rows(
         if sentence_level_id is not None:
             dstart, dend = derive_sentence_window_from_words(sorted_word_segments, audio_duration_s, buffer_s=0.010)
             if dstart is not None and dend is not None:
-                utterance_start_time = dstart
-                utterance_end_time = dend
+                close_utterance_start_time = dstart+relative_start
+                close_utterance_end_time = dend+relative_start
+
+                if debug and (close_utterance_start_time< utterance_start_time or close_utterance_end_time> utterance_end_time):
+                    print("Warning: the word segments extend past the original sentence audio")
+                    print("Close:",close_utterance_start_time, close_utterance_end_time)
+
                 utterance_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment_close.wav"
                 export_clip(
                     audio_data,
-                    utterance_start_time,
-                    utterance_end_time,
+                    close_utterance_start_time,
+                    close_utterance_end_time,
                     os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename)
                 )
 
