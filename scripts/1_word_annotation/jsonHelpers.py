@@ -111,6 +111,8 @@ def load_sentence_label_timestamps(sentence_labels_csv):
         # Special case cleanup
         if 'Want to leap and play' in goldStandard:
             goldStandard = "\"Hi, Dawn!\" hooted Dale,\"Want to leap and play?\""
+        if "Nate shouted, his voice a booming echo in the forest" in goldStandard:
+            goldStandard = "You won't escape me, Jake! Nate shouted, his voice a booming echo in the forest."
 
         identifier = f"{original_audio} {goldStandard} {repeated}"
         sentenceLabels_original_audio_timestamps[identifier] = [start_time, end_time]

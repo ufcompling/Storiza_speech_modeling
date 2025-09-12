@@ -27,7 +27,7 @@ from dataHelpers import *
 # ---- Processing parameters ----
 SAMPLE_RATE = 4800
 NGRAM = "full"  # or an int (e.g., 3) if you want fixed-length n-grams
-DEBUG = False #used to print additional data
+DEBUG = True #used to print additional data
 
 
 
@@ -36,35 +36,33 @@ with open(JSON_PATH, "r", encoding="utf-8") as f:
     data = json.load(f)
 
 #============= (1) Examining JSON ================
-if DEBUG:
+#if DEBUG:
     # ---------- Print First Example ----------
-    print("🔍 Structure with example values from first item:\n")
-    #print_structure_with_values(data[0])
-    for item in data:
-      task_id = item.get("id")
-      if task_id == 195798234:
-        print_structure_with_values(item)
+#    print("🔍 Structure with example values from first item:\n")
+#    for item in data:
+#      task_id = item.get("id")
+#      print_structure_with_values(item)
 
     # ---------- Look At Annotation Types ----------
-    types, from_names, pairs = get_annotation_type_sets(data)
-    print(types)
-    print(from_names)
-    print(pairs)
+#    types, from_names, pairs = get_annotation_type_sets(data)
+#    print(types)
+#    print(from_names)
+#    print(pairs)
 
 
 #============= (2) Generate Data DICTs================
 sentenceLabels_original_audio_timestamps = load_sentence_label_timestamps(SENTENCE_LABELS_CSV) #WTW why do we even need this? we can just directly use the audio timestamps
 
 
-if DEBUG:
+#if DEBUG:
 
-    print_structure_with_values(list(sentenceLabels_original_audio_timestamps)[:min(5, len(sentenceLabels_original_audio_timestamps.keys()))])
+#    print_structure_with_values(list(sentenceLabels_original_audio_timestamps)[:min(5, len(sentenceLabels_original_audio_timestamps.keys()))])
 
     #try specific example:
-    try:
-        print(sentenceLabels_original_audio_timestamps[""])
-    except KeyError:
-        print("item not found")
+#    try:
+#        print(sentenceLabels_original_audio_timestamps[""])
+#    except KeyError:
+#        print("item not found")
 
 
 #============= (3) Collecting annotated intended/goldstandard sentences for each audio================

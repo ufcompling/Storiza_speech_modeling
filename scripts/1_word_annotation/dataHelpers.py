@@ -4,6 +4,7 @@ import os
 from functools import lru_cache
 from typing import Dict, List, Tuple, Any
 from pydub import AudioSegment
+import statistics
 
 sec_to_ms = 1000
 website_prefix = 'https://2025storiza.michaelbennie.org/audio_clips/'
@@ -336,12 +337,17 @@ def build_segments_and_rows(
     word_segments_ngram_path_list: List[str] = []
     word_segments_ngram_transcript_list: List[str] = []
 
+    # Compare close vs original time; this is because annotations of word-level tasks might exceed the timestamps of the sentence-level annotations.
+    start_time_diff_list: List[float] = []
+    end_time_diff_list: List[float] = []
+    extreme_cases: List[List] = []
+
     for item in data:
         task_id = item.get("id")
 
         # debug only test 195798234
-        if debug and task_id != 195798234:
-            continue
+    #    if debug and task_id != 195798234:
+    #        continue
 
         # cross-annotation count
         audio_dict[task_id] = audio_dict.get(task_id, 0) + 1
@@ -353,6 +359,8 @@ def build_segments_and_rows(
         goldStandard = item.get("data", {}).get("goldStandard")
         if task_id == 185849965:
             goldStandard = "Pat had a pan."
+        if task_id == 195800625:
+            goldStandard = "You won't escape me, Jake! Nate shouted, his voice a booming echo in the forest."
 
         original_audio_name = item.get("data", {}).get("original_audio_name")
         story_audio_goldstandard_sentences[original_audio_name].append(goldStandard)
@@ -364,6 +372,8 @@ def build_segments_and_rows(
         identifier = f"{original_audio_name} {goldStandard} {repeated}"
 
         # try to read pre-computed utterance window (kept to match original behavior)
+        if task_id == 195800625:
+            print(sentenceLabels_original_audio_timestamps[identifier])
         try:
             utterance_start_time, utterance_end_time = sentenceLabels_original_audio_timestamps[identifier]
         except Exception:
@@ -402,8 +412,8 @@ def build_segments_and_rows(
         actual_buffered_audio_url = item.get("data", {}).get("audio", '')
 
         relative_start = max(0, utterance_start_time - word_offset)
-        if actual_buffered_audio_url:
 
+        if actual_buffered_audio_url:
 
             start_time_list: List[float] = []
             end_time_list: List[float] = []
@@ -459,25 +469,37 @@ def build_segments_and_rows(
                 word_segments_ngram_transcript_list.append(ngram_produced_utterance)
 
         # If no pre-computed utterance window, derive from word spans and export
-    #    if (utterance_start_time is None and
-    #        utterance_end_time is None sentence_level_id is not None):
         if sentence_level_id is not None:
             dstart, dend = derive_sentence_window_from_words(sorted_word_segments, audio_duration_s, buffer_s=0.010)
             if dstart is not None and dend is not None:
                 close_utterance_start_time = dstart+relative_start
                 close_utterance_end_time = dend+relative_start
 
-                if debug and (close_utterance_start_time< utterance_start_time or close_utterance_end_time> utterance_end_time):
-                    print("Warning: the word segments extend past the original sentence audio")
-                    print("Close:",close_utterance_start_time, close_utterance_end_time)
-
                 utterance_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment_close.wav"
+                if debug and (close_utterance_start_time < utterance_start_time or close_utterance_end_time > utterance_end_time):
+                    print("Warning: the word segments extend past the original sentence audio")
+                    print('Original:', utterance_start_time, utterance_end_time)
+                    print("Close:", close_utterance_start_time, close_utterance_end_time)
+                    print(task_id, utterance_output_filename)
+                    print('\n')
+                    start_time_diff = abs(close_utterance_start_time - utterance_start_time)
+                    end_time_diff = abs(close_utterance_end_time - utterance_end_time)
+                    start_time_diff_list.append(start_time_diff)
+                    end_time_diff_list.append(end_time_diff)
+
+                    if start_time_diff > 0.3 or end_time_diff > 0.3:
+                        extreme_cases.append([task_id, round(start_time_diff, 3), round(end_time_diff, 3)])
+
                 export_clip(
                     audio_data,
                     close_utterance_start_time,
                     close_utterance_end_time,
                     os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename)
                 )
+
+                original_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment.wav"
+                if original_output_filename in os.listdir(SENTENCE_SEGMENTS_DIR):
+                    os.system('rm ' + SENTENCE_SEGMENTS_DIR + '/' + original_output_filename)
 
         # Sentence-level collection
         if produced_utterance:
@@ -494,6 +516,14 @@ def build_segments_and_rows(
         assert len(word_segments_path_list) == len(word_segments_error_labels_list), "Mismatch in word segments and error labels length"
         assert len(word_segments_ngram_path_list) == len(word_segments_ngram_transcript_list), "Mismatch in n-gram word segments and transcripts length"
         assert len(word_segments_ngram_path_list) == len(word_segments_error_category_list), "Mismatch in n-gram word segments and word segments length"
+
+    print(start_time_diff_list)
+    print(f'Start time difference: mean {statistics.mean(start_time_diff_list)} std: {statistics.stdev(start_time_diff_list)}')
+    print(f'End time difference: mean {statistics.mean(end_time_diff_list)} std: {statistics.stdev(end_time_diff_list)}')
+    print('\n')
+    print('EXTREME CASES')
+    for case in extreme_cases:
+        print(case)
 
     return (
         audio_dict,
@@ -514,3 +544,5 @@ def build_segments_and_rows(
         word_segments_ngram_transcript_list,
         error_dict,
     )
+
+        
