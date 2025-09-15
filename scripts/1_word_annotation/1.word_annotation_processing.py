@@ -99,11 +99,11 @@ except OSError as e:
     print(f"Error creating directory '{WORD_SEGMENTS_NGRAM_DIR}': {e}")
 
 
+#============= (4) Extract & Format Data================
 
 error_dict = {}
 for annotator in ANNOTATOR_LIST:
   error_dict[annotator] = []
-#============= (4) Extract & Format Data================
 
 (
     audio_dict,
@@ -178,6 +178,7 @@ word_segments_data_ngram['Error Labels'] = word_segments_error_labels_list
 word_segments_data_ngram.to_csv(WORD_LEVEL_NGRAM_CSV, index=False, encoding="utf-8")
 
 # -------- Write Full word-level data --------
+
 task_intended_words_dict = {}
 
 with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f: #bruh, 400 lines
@@ -437,7 +438,6 @@ with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f: #bruh, 40
             error_dict[annotator].append([task_id, annotator, "If you have : for the IPA, then need to add Prolongation in the label", new_row])
           if ":" in produced_word and "Prolongation" not in labels and labels != ["Parental Aid"]:
             error_dict[annotator].append([task_id, annotator, "If you have : for the Produced Word, then need to add Prolongation in the label", new_row])
-
           if IPA != [] and "|" in IPA[0] and "Broken Word" not in labels and labels != ["Parental Aid"]:
             error_dict[annotator].append([task_id, annotator, "If you have | for the IPA, then need to add Broken Word in the label", new_row])
           if "|" in produced_word and "Broken Word" not in labels and labels != ["Parental Aid"]:
@@ -449,16 +449,19 @@ with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f: #bruh, 40
           row['start'] = str(start)
           row['end'] = str(end)
           writer.writerow(row)
+          
 
 print(f"✅ Done! Output saved to: {FORMATTED_FULL_CSV}")
 
-exit()
-# IDK what is happening here
+# exit()
+
 for annotator in ANNOTATOR_LIST:
-    #I DONT HAVE THESE FILES :((((((((((((((((((((((((((((
   with open(FIXES_DIR + ANNOTATOR_MAP[annotator] + '_fixes.txt', 'w') as f:
     print(FIXES_DIR + ANNOTATOR_MAP[annotator] + '_fixes.txt',)
     annotation_errors = error_dict[annotator]
+    print(annotator)
+    print(annotation_errors)
+    print('\n')
     try:
       sorted_annotation_errors = sorted(annotation_errors, key=lambda x: x[0])
     except:
@@ -470,7 +473,7 @@ for annotator in ANNOTATOR_LIST:
   f.close()
 
 
-
+exit()
 
 ### Checking cross-annotations; JSON file seems to only save the latest annotations (from two annotators)
 import pandas as pd

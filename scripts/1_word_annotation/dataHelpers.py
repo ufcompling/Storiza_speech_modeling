@@ -477,17 +477,17 @@ def build_segments_and_rows(
 
                 utterance_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment_close.wav"
                 if debug and (close_utterance_start_time < utterance_start_time or close_utterance_end_time > utterance_end_time):
-                    print("Warning: the word segments extend past the original sentence audio")
-                    print('Original:', utterance_start_time, utterance_end_time)
-                    print("Close:", close_utterance_start_time, close_utterance_end_time)
-                    print(task_id, utterance_output_filename)
-                    print('\n')
+                #    print("Warning: the word segments extend past the original sentence audio")
+                #    print('Original:', utterance_start_time, utterance_end_time)
+                #    print("Close:", close_utterance_start_time, close_utterance_end_time)
+                #    print(task_id, utterance_output_filename)
+                #    print('\n')
                     start_time_diff = abs(close_utterance_start_time - utterance_start_time)
                     end_time_diff = abs(close_utterance_end_time - utterance_end_time)
                     start_time_diff_list.append(start_time_diff)
                     end_time_diff_list.append(end_time_diff)
 
-                    if start_time_diff > 0.3 or end_time_diff > 0.3:
+                    if start_time_diff >= 1 or end_time_diff >= 1:
                         extreme_cases.append([task_id, round(start_time_diff, 3), round(end_time_diff, 3)])
 
                 export_clip(
