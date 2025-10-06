@@ -20,11 +20,12 @@ keys_to_remove = {
 }
 
 # Reviewers to exclude entirely
-REVIEWERS_TO_EXCLUDE = {70585}
+REVIEWERS_TO_EXCLUDE = {70585,70293}
 
 # Optional known user objects (fill these if you have them)
 USER_OVERRIDES: Dict[int, Dict[str, Any]] = {
-    70293: {"id": 70293, "email": "liu.ying@ufl.edu", "first_name": "", "last_name": ""},
+    70585: {"id": 70585, "email": "liu.ying@ufl.edu", "first_name": "", "last_name": ""},
+    70293: {"id": 70293, "email": "michaelbennie@ufl.edu", "first_name": "", "last_name": ""},
 }
 
 # ---------------- Utilities ----------------
@@ -73,11 +74,22 @@ def _is_numeric(x) -> bool:
 def _id_in_ignore(task: Dict[str, Any], ignore_ids: Set[Any]) -> bool:
     return task.get("id") in ignore_ids or task.get("__id__") in ignore_ids
 
+REQUIRED_DATA_FIELDS = ["sentence_level_id"]
+
 def _data_has_blank_or_null(obj: Any) -> bool:
     """
-    True if any value under task['data'] is a blank string (after strip) or None.
-    Booleans (including False) are allowed.
+    True if any value under task['data'] is a blank string (after strip) or None,
+    OR if required fields are missing or blank.
     """
+    # check required fields explicitly
+    if isinstance(obj, dict):
+        for field in REQUIRED_DATA_FIELDS:
+            val = obj.get(field, None)
+            if val is None:
+                return True
+            if isinstance(val, str) and val.strip() == "":
+                return True
+
     if obj is None:
         return True
     if isinstance(obj, str):
@@ -85,7 +97,7 @@ def _data_has_blank_or_null(obj: Any) -> bool:
     if isinstance(obj, (list, tuple)):
         return any(_data_has_blank_or_null(v) for v in obj)
     if isinstance(obj, dict):
-        return any(_data_has_blank_or_null(v) for v in obj.values())
+        return any(_data_has_blank_or_null(v) for k, v in obj.items() if k != 'title')
     return False
 
 def _find_user_obj_in_task(task: Dict[str, Any], user_id: int) -> Optional[Dict[str, Any]]:
@@ -130,12 +142,7 @@ def _completed_by_object(task: Dict[str, Any], user_id: int) -> Dict[str, Any]:
             "last_name": u.get("last_name", ""),
         }
     # final fallback (no task user & no override)
-    return {
-        "id": user_id,
-        "email": "michaelbennie@ufl.edu",
-        "first_name": "",
-        "last_name": "",
-    }
+    return {"id": 70585, "email": "liu.ying@ufl.edu", "first_name": "", "last_name": ""}
 
 # ---------------- Step 1 ----------------
 def compute_tasks_per_annotator(tasks: List[Dict[str, Any]]) -> np.ndarray:
@@ -246,15 +253,25 @@ def sample_tasks_by_annotator_percent(
         tid = t.get("id")
         if min_task_id is not None and tid is not None and _is_numeric(tid) and int(tid) < int(min_task_id):
             continue
+
+        annotator_ids = _task_annotator_ids(t)
+
+
+
         if _data_has_blank_or_null(t.get("data", {})):
             continue
 
-        annotator_ids = _task_annotator_ids(t)
+
+
         if len(annotator_ids) != 1:
             continue
 
+
+
         if len(_task_reviewer_ids(t)) > 1:
             continue
+
+
 
         buckets[next(iter(annotator_ids))].append(t)
 
@@ -276,11 +293,10 @@ def sample_tasks_by_annotator_percent(
 
 # ---------------- Step 3 ----------------
 def _make_placeholder_issues_textarea() -> Dict[str, Any]:
-    # Keep the exact key spellings you specified (including "Reviwer")
     return {
         "id": "0OYVguZmSW",
         "type": "textarea",
-        "value": {"text": ["Placeholder for Reviwer"]},
+        "value": {"text": ["Placeholder for Reviewer"]},
         "origin": "manual",
         "to_name": "commentHeader",
         "from_name": "issues"
@@ -319,7 +335,6 @@ def create_preannotation_and_fillers(task: Dict[str, Any]) -> Dict[str, Any]:
         if isinstance(ann, dict) and isinstance(ann.get("result"), list):
             base_ann = ann
             break
-
     src_results: List[Dict[str, Any]] = base_ann.get("result", []) if base_ann else []
     pre_results = _scrub_and_placeholder_results_for_prediction(src_results)
 
@@ -341,6 +356,9 @@ def create_preannotation_and_fillers(task: Dict[str, Any]) -> Dict[str, Any]:
     t.setdefault("annotations", []).append(filler_ann)
     t["total_annotations"] = len(t.get("annotations", []))
     t["total_predictions"] = len(t.get("predictions", []))
+
+
+
     return t
 
 def _update_task_counts_in_place(tasks: List[Dict[str, Any]]) -> None:
@@ -410,15 +428,44 @@ def compute_annotator_counts_in_sample(sampled_tasks: List[Dict[str, Any]]) -> n
 
 # -------- Example CLI usage --------
 if __name__ == "__main__":
-    INPUT_JSON = Path("../annotationData/words/export_157618_project-157618-at-2025-10-06-08-37-e2ae7485.json")
+    INPUT_JSON = Path("../annotationData/words/export_157618_project-157618-at-2025-10-06-13-59-da735529.json")
     OUTPUT = Path("../processed_data/cross-annotations-v2.json")
+
+    previous_ids = [
+        188964239,
+        188964244,
+        188964221,
+        188964220,
+        188964217,
+        188964213,
+        188964287,
+        188964204,
+        188964281,
+        188964287,
+        188964286,
+        188964208,
+        188964283,
+        188964284,
+        188964241,
+        188964212,
+        188964223,
+        188964278,
+        188964242,
+        188964285,
+        188964240,
+        188964211,
+        188964218,
+        188964243,
+        188964245,
+        188964216
+    ]
 
     table_before, sample = generate_cross_annotation_json_v2(
         input_file_path=INPUT_JSON,
         output_file_path=OUTPUT,
-        percent=2,
+        percent=10,
         min_task_id=None,
-        ignore_ids=None,
+        ignore_ids=previous_ids,
         seed=42
     )
 
@@ -435,12 +482,6 @@ if __name__ == "__main__":
     for annotator_id, total in annotator_counts_after:
         print(f"  annotator {annotator_id}: {total} tasks")
 
-    print("\nAnnotator task counts (in FINAL SAMPLE):")
-    for annotator_id, total in sample_counts:
-        print(f"  annotator {annotator_id}: {total} sampled tasks")
 
-    print("\nReviewer frequency (post-exclusion):")
-    for reviewer_id, total in reviewer_freq:
-        print(f"  reviewer {reviewer_id}: {total} tasks")
 
     print(f"\nWrote {len(sample)} sampled+processed tasks to {OUTPUT}")
