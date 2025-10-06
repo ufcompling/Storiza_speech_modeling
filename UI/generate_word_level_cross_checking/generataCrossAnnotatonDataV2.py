@@ -24,7 +24,7 @@ REVIEWERS_TO_EXCLUDE = {70585}
 
 # Optional known user objects (fill these if you have them)
 USER_OVERRIDES: Dict[int, Dict[str, Any]] = {
-    70293: {"id": 70293, "email": "liu.ying@ufl.edu", "first_name": "", "last_name": ""},
+    70293: {"id": 70585, "email": "liu.ying@ufl.edu", "first_name": "", "last_name": ""},
 }
 
 # ---------------- Utilities ----------------
@@ -73,11 +73,22 @@ def _is_numeric(x) -> bool:
 def _id_in_ignore(task: Dict[str, Any], ignore_ids: Set[Any]) -> bool:
     return task.get("id") in ignore_ids or task.get("__id__") in ignore_ids
 
+REQUIRED_DATA_FIELDS = ["sentence_level_id"]
+
 def _data_has_blank_or_null(obj: Any) -> bool:
     """
-    True if any value under task['data'] is a blank string (after strip) or None.
-    Booleans (including False) are allowed.
+    True if any value under task['data'] is a blank string (after strip) or None,
+    OR if required fields are missing or blank.
     """
+    # check required fields explicitly
+    if isinstance(obj, dict):
+        for field in REQUIRED_DATA_FIELDS:
+            val = obj.get(field, None)
+            if val is None:
+                return True
+            if isinstance(val, str) and val.strip() == "":
+                return True
+
     if obj is None:
         return True
     if isinstance(obj, str):
@@ -276,11 +287,10 @@ def sample_tasks_by_annotator_percent(
 
 # ---------------- Step 3 ----------------
 def _make_placeholder_issues_textarea() -> Dict[str, Any]:
-    # Keep the exact key spellings you specified (including "Reviwer")
     return {
         "id": "0OYVguZmSW",
         "type": "textarea",
-        "value": {"text": ["Placeholder for Reviwer"]},
+        "value": {"text": ["Placeholder for Reviewer"]},
         "origin": "manual",
         "to_name": "commentHeader",
         "from_name": "issues"
@@ -410,15 +420,44 @@ def compute_annotator_counts_in_sample(sampled_tasks: List[Dict[str, Any]]) -> n
 
 # -------- Example CLI usage --------
 if __name__ == "__main__":
-    INPUT_JSON = Path("../annotationData/words/export_157618_project-157618-at-2025-10-06-08-37-e2ae7485.json")
+    INPUT_JSON = Path("../annotationData/words/export_157618_project-157618-at-2025-10-06-13-59-da735529.json")
     OUTPUT = Path("../processed_data/cross-annotations-v2.json")
+
+    previous_ids = [
+        188964239,
+        188964244,
+        188964221,
+        188964220,
+        188964217,
+        188964213,
+        188964287,
+        188964204,
+        188964281,
+        188964287,
+        188964286,
+        188964208,
+        188964283,
+        188964284,
+        188964241,
+        188964212,
+        188964223,
+        188964278,
+        188964242,
+        188964285,
+        188964240,
+        188964211,
+        188964218,
+        188964243,
+        188964245,
+        188964216
+    ]
 
     table_before, sample = generate_cross_annotation_json_v2(
         input_file_path=INPUT_JSON,
         output_file_path=OUTPUT,
         percent=2,
         min_task_id=None,
-        ignore_ids=None,
+        ignore_ids=previous_ids,
         seed=42
     )
 
