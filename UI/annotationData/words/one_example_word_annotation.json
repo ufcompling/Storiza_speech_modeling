@@ -1,0 +1,1953 @@
+[
+  {
+    "id": 185499470,
+    "annotations": [
+      {
+        "id": 63111734,
+        "completed_by": {
+          "id": 75323,
+          "email": "emilianapulido@ufl.edu",
+          "first_name": "",
+          "last_name": ""
+        },
+        "result": [
+          {
+            "id": "016jG",
+            "type": "labels",
+            "value": {
+              "end": 2.5070979599330356,
+              "start": 2.0318228664265425,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "016jG",
+            "type": "textarea",
+            "value": {
+              "end": 2.5070979599330356,
+              "text": [
+                "The"
+              ],
+              "start": 2.0318228664265425,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "jHMJO",
+            "type": "labels",
+            "value": {
+              "end": 2.9124796573356333,
+              "start": 2.535055318374594,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "jHMJO",
+            "type": "textarea",
+            "value": {
+              "end": 2.9124796573356333,
+              "text": [
+                "big"
+              ],
+              "start": 2.535055318374594,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "vu3W7",
+            "type": "labels",
+            "value": {
+              "end": 3.4296907885044643,
+              "start": 2.982373053439529,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "vu3W7",
+            "type": "textarea",
+            "value": {
+              "end": 3.4296907885044643,
+              "text": [
+                "race"
+              ],
+              "start": 2.982373053439529,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "hjHyx",
+            "type": "labels",
+            "value": {
+              "end": 3.890987202790179,
+              "start": 3.485605505387581,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "hjHyx",
+            "type": "textarea",
+            "value": {
+              "end": 3.890987202790179,
+              "text": [
+                "day"
+              ],
+              "start": 3.485605505387581,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "HnV4r",
+            "type": "labels",
+            "value": {
+              "end": 4.673793239153815,
+              "start": 4.142603428764205,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "HnV4r",
+            "type": "textarea",
+            "value": {
+              "end": 4.673793239153815,
+              "text": [
+                "had"
+              ],
+              "start": 4.142603428764205,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "eEmE-",
+            "type": "labels",
+            "value": {
+              "end": 5.145646282382925,
+              "start": 4.691968762013023,
+              "labels": [
+                "Phonological Error"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "eEmE-",
+            "type": "textarea",
+            "value": {
+              "end": 5.145646282382925,
+              "text": [
+                "come"
+              ],
+              "start": 4.691968762013023,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "eEmE-",
+            "type": "choices",
+            "value": {
+              "end": 5.145646282382925,
+              "start": 4.691968762013023,
+              "channel": 0,
+              "choices": [
+                "Vowel Substitution",
+                "Consonant Insertion",
+                "Vowel Insertion"
+              ]
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "PhonologicalErrorType",
+            "original_length": 10.763583
+          },
+          {
+            "id": "eEmE-",
+            "type": "textarea",
+            "value": {
+              "end": 5.145646282382925,
+              "text": [
+                "/ˈkɑmədi/"
+              ],
+              "start": 4.691968762013023,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "mispronunciation_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "cd0HU",
+            "type": "labels",
+            "value": {
+              "end": 5.351631546287719,
+              "start": 5.1627411860497,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "cd0HU",
+            "type": "textarea",
+            "value": {
+              "end": 5.351631546287719,
+              "text": [
+                "and"
+              ],
+              "start": 5.1627411860497,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "PJ0o-",
+            "type": "labels",
+            "value": {
+              "end": 5.912650348097675,
+              "start": 5.356494479524703,
+              "labels": [
+                "Phonological Error"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "PJ0o-",
+            "type": "choices",
+            "value": {
+              "end": 5.912650348097675,
+              "start": 5.356494479524703,
+              "channel": 0,
+              "choices": [
+                "Consonant Substitution"
+              ]
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "PhonologicalErrorType",
+            "original_length": 10.763583
+          },
+          {
+            "id": "PJ0o-",
+            "type": "textarea",
+            "value": {
+              "end": 5.912650348097675,
+              "text": [
+                "Finn"
+              ],
+              "start": 5.356494479524703,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "PJ0o-",
+            "type": "textarea",
+            "value": {
+              "end": 5.912650348097675,
+              "text": [
+                "/fɪl/"
+              ],
+              "start": 5.356494479524703,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "mispronunciation_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "Ht5sa",
+            "type": "labels",
+            "value": {
+              "end": 7.181134976511135,
+              "start": 6.41910495208551,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "Ht5sa",
+            "type": "textarea",
+            "value": {
+              "end": 7.181134976511135,
+              "text": [
+                "was"
+              ],
+              "start": 6.41910495208551,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "eI3NR",
+            "type": "labels",
+            "value": {
+              "end": 8.298813336122361,
+              "start": 7.68973393708876,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "eI3NR",
+            "type": "textarea",
+            "value": {
+              "end": 8.298813336122361,
+              "text": [
+                "ready"
+              ],
+              "start": 7.68973393708876,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "XQL-Z",
+            "type": "labels",
+            "value": {
+              "end": 8.922352677216194,
+              "start": 8.376493394188687,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "XQL-Z",
+            "type": "textarea",
+            "value": {
+              "end": 8.922352677216194,
+              "text": [
+                "to"
+              ],
+              "start": 8.376493394188687,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "YlknT",
+            "type": "labels",
+            "value": {
+              "end": 9.35245341395718,
+              "start": 8.932702846030491,
+              "labels": [
+                "Correct"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          },
+          {
+            "id": "YlknT",
+            "type": "textarea",
+            "value": {
+              "end": 9.35245341395718,
+              "text": [
+                "join"
+              ],
+              "start": 8.932702846030491,
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "spoken_word",
+            "original_length": 10.763583
+          },
+          {
+            "id": "KcAiI",
+            "type": "labels",
+            "value": {
+              "end": 6.410563176311105,
+              "start": 6.238226557737634,
+              "labels": [
+                "Unintelligible"
+              ],
+              "channel": 0
+            },
+            "origin": "manual",
+            "to_name": "WordAudio",
+            "from_name": "WordAnnotation",
+            "original_length": 10.763583
+          }
+        ],
+        "reviews": [
+          {
+            "id": 6347593,
+            "created_by": {
+              "id": 75323,
+              "email": "emilianapulido@ufl.edu",
+              "first_name": "",
+              "last_name": ""
+            },
+            "created_at": "2025-07-18T15:17:33.714479Z",
+            "accepted": true,
+            "result": null,
+            "annotation": 63111734,
+            "fixed_annotation_history": 71657799,
+            "previous_annotation_history": 71654281,
+            "last_annotation_history": null,
+            "remove_from_queue": null,
+            "started_at": null,
+            "previous_annotation_history_result": [
+              {
+                "id": "016jG",
+                "type": "labels",
+                "value": {
+                  "end": 2.5070979599330356,
+                  "start": 2.0318228664265425,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "016jG",
+                "type": "textarea",
+                "value": {
+                  "end": 2.5070979599330356,
+                  "text": [
+                    "The"
+                  ],
+                  "start": 2.0318228664265425,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "jHMJO",
+                "type": "labels",
+                "value": {
+                  "end": 2.9124796573356333,
+                  "start": 2.535055318374594,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "jHMJO",
+                "type": "textarea",
+                "value": {
+                  "end": 2.9124796573356333,
+                  "text": [
+                    "big"
+                  ],
+                  "start": 2.535055318374594,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "vu3W7",
+                "type": "labels",
+                "value": {
+                  "end": 3.4296907885044643,
+                  "start": 2.982373053439529,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "vu3W7",
+                "type": "textarea",
+                "value": {
+                  "end": 3.4296907885044643,
+                  "text": [
+                    "race"
+                  ],
+                  "start": 2.982373053439529,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "hjHyx",
+                "type": "labels",
+                "value": {
+                  "end": 3.890987202790179,
+                  "start": 3.485605505387581,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "hjHyx",
+                "type": "textarea",
+                "value": {
+                  "end": 3.890987202790179,
+                  "text": [
+                    "day"
+                  ],
+                  "start": 3.485605505387581,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "HnV4r",
+                "type": "labels",
+                "value": {
+                  "end": 4.673793239153815,
+                  "start": 4.142603428764205,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "HnV4r",
+                "type": "textarea",
+                "value": {
+                  "end": 4.673793239153815,
+                  "text": [
+                    "had"
+                  ],
+                  "start": 4.142603428764205,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "labels",
+                "value": {
+                  "end": 5.145646282382925,
+                  "start": 4.691968762013023,
+                  "labels": [
+                    "Phonological Error"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.145646282382925,
+                  "text": [
+                    "come"
+                  ],
+                  "start": 4.691968762013023,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "choices",
+                "value": {
+                  "end": 5.145646282382925,
+                  "start": 4.691968762013023,
+                  "channel": 0,
+                  "choices": [
+                    "Vowel Substitution",
+                    "Consonant Insertion",
+                    "Vowel Insertion"
+                  ]
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "PhonologicalErrorType",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.145646282382925,
+                  "text": [
+                    "/ˈkɑmədi/"
+                  ],
+                  "start": 4.691968762013023,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "mispronunciation_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "cd0HU",
+                "type": "labels",
+                "value": {
+                  "end": 5.351631546287719,
+                  "start": 5.1627411860497,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "cd0HU",
+                "type": "textarea",
+                "value": {
+                  "end": 5.351631546287719,
+                  "text": [
+                    "and"
+                  ],
+                  "start": 5.1627411860497,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "labels",
+                "value": {
+                  "end": 5.912650348097675,
+                  "start": 5.356494479524703,
+                  "labels": [
+                    "Phonological Error"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "choices",
+                "value": {
+                  "end": 5.912650348097675,
+                  "start": 5.356494479524703,
+                  "channel": 0,
+                  "choices": [
+                    "Consonant Substitution"
+                  ]
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "PhonologicalErrorType",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.912650348097675,
+                  "text": [
+                    "Finn"
+                  ],
+                  "start": 5.356494479524703,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.912650348097675,
+                  "text": [
+                    "/fɪl/"
+                  ],
+                  "start": 5.356494479524703,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "mispronunciation_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "Ht5sa",
+                "type": "labels",
+                "value": {
+                  "end": 7.181134976511135,
+                  "start": 6.41910495208551,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "Ht5sa",
+                "type": "textarea",
+                "value": {
+                  "end": 7.181134976511135,
+                  "text": [
+                    "was"
+                  ],
+                  "start": 6.41910495208551,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eI3NR",
+                "type": "labels",
+                "value": {
+                  "end": 8.298813336122361,
+                  "start": 7.68973393708876,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eI3NR",
+                "type": "textarea",
+                "value": {
+                  "end": 8.298813336122361,
+                  "text": [
+                    "ready"
+                  ],
+                  "start": 7.68973393708876,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "XQL-Z",
+                "type": "labels",
+                "value": {
+                  "end": 8.914403206758292,
+                  "start": 8.368543923730785,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "XQL-Z",
+                "type": "textarea",
+                "value": {
+                  "end": 8.914403206758292,
+                  "text": [
+                    "to"
+                  ],
+                  "start": 8.368543923730785,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "YlknT",
+                "type": "labels",
+                "value": {
+                  "end": 9.35245341395718,
+                  "start": 8.932702846030491,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "YlknT",
+                "type": "textarea",
+                "value": {
+                  "end": 9.35245341395718,
+                  "text": [
+                    "join"
+                  ],
+                  "start": 8.932702846030491,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "KcAiI",
+                "type": "labels",
+                "value": {
+                  "end": 6.410563176311105,
+                  "start": 6.238226557737634,
+                  "labels": [
+                    "Unintelligible"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              }
+            ],
+            "fixed_annotation_history_result": [
+              {
+                "id": "016jG",
+                "type": "labels",
+                "value": {
+                  "end": 2.5070979599330356,
+                  "start": 2.0318228664265425,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "016jG",
+                "type": "textarea",
+                "value": {
+                  "end": 2.5070979599330356,
+                  "text": [
+                    "The"
+                  ],
+                  "start": 2.0318228664265425,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "jHMJO",
+                "type": "labels",
+                "value": {
+                  "end": 2.9124796573356333,
+                  "start": 2.535055318374594,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "jHMJO",
+                "type": "textarea",
+                "value": {
+                  "end": 2.9124796573356333,
+                  "text": [
+                    "big"
+                  ],
+                  "start": 2.535055318374594,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "vu3W7",
+                "type": "labels",
+                "value": {
+                  "end": 3.4296907885044643,
+                  "start": 2.982373053439529,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "vu3W7",
+                "type": "textarea",
+                "value": {
+                  "end": 3.4296907885044643,
+                  "text": [
+                    "race"
+                  ],
+                  "start": 2.982373053439529,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "hjHyx",
+                "type": "labels",
+                "value": {
+                  "end": 3.890987202790179,
+                  "start": 3.485605505387581,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "hjHyx",
+                "type": "textarea",
+                "value": {
+                  "end": 3.890987202790179,
+                  "text": [
+                    "day"
+                  ],
+                  "start": 3.485605505387581,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "HnV4r",
+                "type": "labels",
+                "value": {
+                  "end": 4.673793239153815,
+                  "start": 4.142603428764205,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "HnV4r",
+                "type": "textarea",
+                "value": {
+                  "end": 4.673793239153815,
+                  "text": [
+                    "had"
+                  ],
+                  "start": 4.142603428764205,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "labels",
+                "value": {
+                  "end": 5.145646282382925,
+                  "start": 4.691968762013023,
+                  "labels": [
+                    "Phonological Error"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.145646282382925,
+                  "text": [
+                    "come"
+                  ],
+                  "start": 4.691968762013023,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "choices",
+                "value": {
+                  "end": 5.145646282382925,
+                  "start": 4.691968762013023,
+                  "channel": 0,
+                  "choices": [
+                    "Vowel Substitution",
+                    "Consonant Insertion",
+                    "Vowel Insertion"
+                  ]
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "PhonologicalErrorType",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.145646282382925,
+                  "text": [
+                    "/ˈkɑmədi/"
+                  ],
+                  "start": 4.691968762013023,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "mispronunciation_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "cd0HU",
+                "type": "labels",
+                "value": {
+                  "end": 5.351631546287719,
+                  "start": 5.1627411860497,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "cd0HU",
+                "type": "textarea",
+                "value": {
+                  "end": 5.351631546287719,
+                  "text": [
+                    "and"
+                  ],
+                  "start": 5.1627411860497,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "labels",
+                "value": {
+                  "end": 5.912650348097675,
+                  "start": 5.356494479524703,
+                  "labels": [
+                    "Phonological Error"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "choices",
+                "value": {
+                  "end": 5.912650348097675,
+                  "start": 5.356494479524703,
+                  "channel": 0,
+                  "choices": [
+                    "Consonant Substitution"
+                  ]
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "PhonologicalErrorType",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.912650348097675,
+                  "text": [
+                    "Finn"
+                  ],
+                  "start": 5.356494479524703,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.912650348097675,
+                  "text": [
+                    "/fɪl/"
+                  ],
+                  "start": 5.356494479524703,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "mispronunciation_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "Ht5sa",
+                "type": "labels",
+                "value": {
+                  "end": 7.181134976511135,
+                  "start": 6.41910495208551,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "Ht5sa",
+                "type": "textarea",
+                "value": {
+                  "end": 7.181134976511135,
+                  "text": [
+                    "was"
+                  ],
+                  "start": 6.41910495208551,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eI3NR",
+                "type": "labels",
+                "value": {
+                  "end": 8.298813336122361,
+                  "start": 7.68973393708876,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eI3NR",
+                "type": "textarea",
+                "value": {
+                  "end": 8.298813336122361,
+                  "text": [
+                    "ready"
+                  ],
+                  "start": 7.68973393708876,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "XQL-Z",
+                "type": "labels",
+                "value": {
+                  "end": 8.922352677216194,
+                  "start": 8.376493394188687,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "XQL-Z",
+                "type": "textarea",
+                "value": {
+                  "end": 8.922352677216194,
+                  "text": [
+                    "to"
+                  ],
+                  "start": 8.376493394188687,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "YlknT",
+                "type": "labels",
+                "value": {
+                  "end": 9.35245341395718,
+                  "start": 8.932702846030491,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "YlknT",
+                "type": "textarea",
+                "value": {
+                  "end": 9.35245341395718,
+                  "text": [
+                    "join"
+                  ],
+                  "start": 8.932702846030491,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "KcAiI",
+                "type": "labels",
+                "value": {
+                  "end": 6.410563176311105,
+                  "start": 6.238226557737634,
+                  "labels": [
+                    "Unintelligible"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              }
+            ]
+          },
+          {
+            "id": 6342845,
+            "created_by": {
+              "id": 70585,
+              "email": "liu.ying@ufl.edu",
+              "first_name": "",
+              "last_name": ""
+            },
+            "created_at": "2025-07-18T08:32:58.913560Z",
+            "accepted": false,
+            "result": null,
+            "annotation": 63111734,
+            "fixed_annotation_history": null,
+            "previous_annotation_history": 68854973,
+            "last_annotation_history": null,
+            "remove_from_queue": null,
+            "started_at": null,
+            "previous_annotation_history_result": [
+              {
+                "id": "016jG",
+                "type": "labels",
+                "value": {
+                  "end": 2.5070979599330356,
+                  "start": 2.0318228664265425,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "016jG",
+                "type": "textarea",
+                "value": {
+                  "end": 2.5070979599330356,
+                  "text": [
+                    "The"
+                  ],
+                  "start": 2.0318228664265425,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "jHMJO",
+                "type": "labels",
+                "value": {
+                  "end": 2.9124796573356333,
+                  "start": 2.535055318374594,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "jHMJO",
+                "type": "textarea",
+                "value": {
+                  "end": 2.9124796573356333,
+                  "text": [
+                    "big"
+                  ],
+                  "start": 2.535055318374594,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "vu3W7",
+                "type": "labels",
+                "value": {
+                  "end": 3.4296907885044643,
+                  "start": 2.982373053439529,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "vu3W7",
+                "type": "textarea",
+                "value": {
+                  "end": 3.4296907885044643,
+                  "text": [
+                    "race"
+                  ],
+                  "start": 2.982373053439529,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "hjHyx",
+                "type": "labels",
+                "value": {
+                  "end": 3.890987202790179,
+                  "start": 3.485605505387581,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "hjHyx",
+                "type": "textarea",
+                "value": {
+                  "end": 3.890987202790179,
+                  "text": [
+                    "day"
+                  ],
+                  "start": 3.485605505387581,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "HnV4r",
+                "type": "labels",
+                "value": {
+                  "end": 4.673793239153815,
+                  "start": 4.142603428764205,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "HnV4r",
+                "type": "textarea",
+                "value": {
+                  "end": 4.673793239153815,
+                  "text": [
+                    "had"
+                  ],
+                  "start": 4.142603428764205,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "labels",
+                "value": {
+                  "end": 5.145646282382925,
+                  "start": 4.691968762013023,
+                  "labels": [
+                    "Disfluency Error"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eEmE-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.145646282382925,
+                  "text": [
+                    "come"
+                  ],
+                  "start": 4.691968762013023,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "cd0HU",
+                "type": "labels",
+                "value": {
+                  "end": 5.42707698263366,
+                  "start": 5.1627411860497,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "cd0HU",
+                "type": "textarea",
+                "value": {
+                  "end": 5.42707698263366,
+                  "text": [
+                    "and"
+                  ],
+                  "start": 5.1627411860497,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "labels",
+                "value": {
+                  "end": 5.912650348097675,
+                  "start": 5.48741450141913,
+                  "labels": [
+                    "Phonological Error"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "choices",
+                "value": {
+                  "end": 5.912650348097675,
+                  "start": 5.48741450141913,
+                  "channel": 0,
+                  "choices": [
+                    "Consonant Substitution"
+                  ]
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "PhonologicalErrorType",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.912650348097675,
+                  "text": [
+                    "Finn"
+                  ],
+                  "start": 5.48741450141913,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "PJ0o-",
+                "type": "textarea",
+                "value": {
+                  "end": 5.912650348097675,
+                  "text": [
+                    "/fɪl/"
+                  ],
+                  "start": 5.48741450141913,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "mispronunciation_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "Ht5sa",
+                "type": "labels",
+                "value": {
+                  "end": 7.181134976511135,
+                  "start": 6.41910495208551,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "Ht5sa",
+                "type": "textarea",
+                "value": {
+                  "end": 7.181134976511135,
+                  "text": [
+                    "was"
+                  ],
+                  "start": 6.41910495208551,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eI3NR",
+                "type": "labels",
+                "value": {
+                  "end": 8.298813336122361,
+                  "start": 7.68973393708876,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "eI3NR",
+                "type": "textarea",
+                "value": {
+                  "end": 8.298813336122361,
+                  "text": [
+                    "ready"
+                  ],
+                  "start": 7.68973393708876,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "XQL-Z",
+                "type": "labels",
+                "value": {
+                  "end": 8.914403206758292,
+                  "start": 8.368543923730785,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "XQL-Z",
+                "type": "textarea",
+                "value": {
+                  "end": 8.914403206758292,
+                  "text": [
+                    "to"
+                  ],
+                  "start": 8.368543923730785,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "YlknT",
+                "type": "labels",
+                "value": {
+                  "end": 9.35245341395718,
+                  "start": 8.932702846030491,
+                  "labels": [
+                    "Correct"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              },
+              {
+                "id": "YlknT",
+                "type": "textarea",
+                "value": {
+                  "end": 9.35245341395718,
+                  "text": [
+                    "join"
+                  ],
+                  "start": 8.932702846030491,
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "spoken_word",
+                "original_length": 10.763583
+              },
+              {
+                "id": "KcAiI",
+                "type": "labels",
+                "value": {
+                  "end": 6.410563176311105,
+                  "start": 6.238226557737634,
+                  "labels": [
+                    "Unintelligible"
+                  ],
+                  "channel": 0
+                },
+                "origin": "manual",
+                "to_name": "WordAudio",
+                "from_name": "WordAnnotation",
+                "original_length": 10.763583
+              }
+            ]
+          }
+        ],
+        "was_cancelled": false,
+        "ground_truth": false,
+        "created_at": "2025-06-11T18:07:27.144939Z",
+        "updated_at": "2025-07-18T14:25:14.395247Z",
+        "draft_created_at": "2025-06-11T17:58:37.488287Z",
+        "lead_time": 852.2679999999999,
+        "prediction": {},
+        "result_count": 13,
+        "unique_id": "3093ba23-5233-4d63-9eaf-3e45b2ee3aa0",
+        "import_id": null,
+        "last_action": "fixed_and_accepted",
+        "bulk_created": false,
+        "task": 185499470,
+        "project": 157618,
+        "updated_by": 75323,
+        "parent_prediction": null,
+        "parent_annotation": null,
+        "last_created_by": 75323
+      }
+    ],
+    "file_upload": "cbb51adf-audio_segments_data.json",
+    "drafts": [],
+    "predictions": [],
+    "agreement": 100,
+    "data": {
+      "time": "2025-03-20",
+      "audio": "https://2025storiza.michaelbennie.org/audio_clips/77.0_end_85.7_uid_IGe7nmfoeKQG1oyWJEMIv6KIP5Q2_sid_OJ3hCvb3pokTxqbvhJuh_1742508917.mp3",
+      "grade": "2nd Grade",
+      "runon": false,
+      "sound": "ir, ur",
+      "title": "Race Car",
+      "topic": "R-Controlled Vowels",
+      "words": 250,
+      "__id__": "OJ3hCvb3pokTxqbvhJuh",
+      "actual": "The big race day had come, and Finn was ready to join.",
+      "userId": "IGe7nmfoeKQG1oyWJEMIv6KIP5Q2",
+      "content": "Finn the racer had a sturdy red car that purred with power. Early each morning, Finn would hurry to the track. His favorite turn on the racecourse was called the Curvy Curve. The big race day had come, and Finn was ready to join. As he started his car, it made a soft whirr. The engines of many cars trembled with excitement. Finn felt a flutter of thrill inside him. With the starting flag up, Finn surged forward. The sound of the rushing air made a humming melody. As Finn approached the Curvy Curve, he remembered to steer with care. His car turned smoothly like a bird in flight, making him smile with joy. Suddenly, a sharp bump shook Finn's car. He felt uncertainty and his heart thudded fast, but he stayed firm. He gripped the wheel, drove forward and swiftly passed other cars. The crowd cheered as Finn crossed the finish line, his spirits high and triumphant. Finn had won the race! With a grateful smile, he waved to the people. The racing journey had taught him courage, bringing him joy and a feeling of pride.",
+      "picture": "images/story/img-SzQsqY8n6jTTM5JtxUFiao74.png",
+      "IPAHints": "2. big: /bɪɡ/\n3. come: /kʌm/\n4. day: /deɪ/\n5. finn: /fɪn/\n7. join: /d͡ʒɔɪn/\n8. race: /ɹeɪs/\n9. ready: /ɹɛdi/\n10. the: /ði/, /ðɪ/\n11. to: /toʊ/, /tu/\n12. was: /wɑz/, /wəz/, /wʌz/",
+      "end_time": 85.7425155882074,
+      "nonchild": false,
+      "repeated": false,
+      "start_time": 76.9789272441761,
+      "annotator_id": 75323,
+      "goldStandard": "The big race day had come, and Finn was ready to join.",
+      "segment_time": 8.763588344031291,
+      "original_audio_name": "uid_IGe7nmfoeKQG1oyWJEMIv6KIP5Q2_sid_OJ3hCvb3pokTxqbvhJuh_1742508917.wav"
+    },
+    "meta": {},
+    "created_at": "2025-06-11T17:26:56.116753Z",
+    "updated_at": "2025-07-18T15:17:34.010365Z",
+    "inner_id": 7,
+    "total_annotations": 1,
+    "cancelled_annotations": 0,
+    "total_predictions": 0,
+    "comment_count": 1,
+    "unresolved_comment_count": 1,
+    "last_comment_updated_at": "2025-07-18T08:32:56.872633Z",
+    "project": 157618,
+    "updated_by": 75323,
+    "comment_authors": [
+      70585
+    ]
+  }
+]
