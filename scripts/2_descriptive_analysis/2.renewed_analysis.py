@@ -84,8 +84,8 @@ def total_time_main(in_path: Path, out_story_path: Path, out_sum_path: Path,
 
     
     df[["uid", "audio_id"]] = df["utterance_output_filename"].apply(
-    #    lambda s: pd.Series(parse_filename(s))
-        lambda s: pd.Series(parse_word_key(s))
+        lambda s: pd.Series(parse_filename(s))
+    #    lambda s: pd.Series(parse_word_key(s))
     )
 
     df = df.dropna(subset=["uid", "audio_id"]).copy()
@@ -288,13 +288,10 @@ def build_wpm_tables(word_df: pd.DataFrame,
     stories_df["audio_id"] = stories_df["audio_id"].astype(str).str.strip()
     
     word_counts = word_df.groupby(["audio_id", "uid"], as_index=False).size().rename(columns={"size": "n_words"})
-    print('WORD COUNT')
-    print(word_counts)
+
     story_len = stories_df[["audio_id", "uid", "story_length"]].copy()
-    print("STORY LEN")
-    print(story_len)
+
     w_join = word_counts.merge(story_len, on=["audio_id", "uid"], how="inner")
-    print(w_join)
     
     w_join = w_join[w_join["story_length"] > 0].copy()
 
