@@ -27,7 +27,7 @@ def read_audio(fname):
 	wav, sr = sf.read(fname)
 	return wav, sr
 
-chars_to_ignore_regex = '[\,\?\!\-\;\"\(\)\&\-\>\[\]\_]'
+chars_to_ignore_regex = '[\,\?\!\-\;\"\(\)\&\-\>\[\]\_\ˈ]'
 
 def clean_sent(transcript):
 	while '/' in transcript:
@@ -179,18 +179,22 @@ def train(data_path, train_data, test_data, pretrained_model, seed):
 	for v, k in vocab_dict.items():
 		print(v, k)
 
-	with open(data_path + 'random/' + seed + '/' + pretrained_model + '/vocab.json', 'w', encoding="utf-8") as vocab_file:
-		json.dump(vocab_dict, vocab_file, ensure_ascii=False)
-	
-	## Creation of the tokeniser
-	print("Setting up tokenizer...")
-	tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(data_path + 'random/' + seed + '/' + pretrained_model + '/', unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
-	
+
 	repo_name = f'asr_model/random/{seed}/{pretrained_model}/'
 	print(f"Model will be saved to: {repo_name}")
 	
 	if not os.path.exists(repo_name):
 		os.makedirs(repo_name)
+
+	with open(data_path + 'random/' + seed + '/' + pretrained_model + '/vocab.json', 'w', encoding="utf-8") as vocab_file:
+		json.dump(vocab_dict, vocab_file, ensure_ascii=False)
+	
+	for f in os.listdir(data_path + 'random/' + seed + '/' + pretrained_model + '/'):
+		print(f)
+
+	## Creation of the tokeniser
+	print("Setting up tokenizer...")
+	tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(data_path + 'random/' + seed + '/' + pretrained_model + '/', unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
 		
 	tokenizer.save_pretrained(repo_name)
 
@@ -452,12 +456,12 @@ def main():
 	pretrained_model = args.pretrained_model
 
 	# Create directories
-	try:
-		if not args.skip_training:
-			os.system(f'rm -r {data_path}random/{seed}/*')
-			print('Removed old models')
-	except:
-		pass
+#	try:
+#		if not args.skip_training:
+#			os.system(f'rm -r {data_path}random/{seed}/*')
+#			print('Removed old models')
+#	except:
+#		pass
 
 	for dir_path in [f'{data_path}random/', f'{data_path}random/{seed}']:
 		if not os.path.exists(dir_path):
@@ -480,7 +484,7 @@ def main():
 		model_path = repo_name
 	else:
 		# Load existing vocab for evaluation only
-		with open('vocab.json', 'r') as f:
+		with open(data_path + 'random/' + seed + '/' + pretrained_model + '/vocab.json', 'r') as f:
 			vocab_dict = json.load(f)
 		print("Skipping training, loading existing model...")
 
@@ -494,4 +498,5 @@ def main():
 if __name__ == "__main__":
 	main()
 	print("Script finished running")
+
 

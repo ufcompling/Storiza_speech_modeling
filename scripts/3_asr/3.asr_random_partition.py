@@ -21,7 +21,7 @@ level = sys.argv[1].split('/')[1].split('_')[0]
 data_path_list = original_data['Path'].tolist()
 data_transcript_list = original_data['Transcript'].tolist()
 data_goldStandard_list = original_data['goldStandard'].tolist()
-
+data_ipa_transcript_list = original_data['IPA_Transcript'].tolist()
 output_path = 'asr_model/' 
 n_random_splits = 1
 
@@ -31,7 +31,9 @@ total_dur = 0
 
 for i in range(len(data_path_list)):
 	file = data_path_list[i]
+	goldStadard = data_goldStandard_list[i].strip()
 	transcript = data_transcript_list[i].strip()
+	ipa_transcript = data_ipa_transcript_list[i].strip()
 	if file.endswith('wav'):
 		sr = 16000
 		signal, sr = sf.read(file) # signal and sampling rate
@@ -41,7 +43,7 @@ for i in range(len(data_path_list)):
 		# wav2vec does not handle short audio very well
 		if dur >= 5 and len(transcript.split()) > 1:
 			total_dur += dur
-			data.append([file, transcript, dur])
+			data.append([file, goldStandard, transcript, ipa_transcript, dur])
 		else:
 			pass
 
@@ -83,21 +85,29 @@ for i in range(0, n_random_splits):
 	print('')
 
 	train_wav_path_list = [tok[0] for tok in train_data]
-	train_transcript_list = [tok[1] for tok in train_data]
+	train_goldStandard_list = [tok[1] for tok in train_data]
+	train_transcript_list = [tok[2] for tok in train_data]
+	train_ipa_transcript_list = [tok[3] for tok in train_data]
 	train_dur_list = [tok[-1] for tok in train_data]
 
 	train_output = pd.DataFrame({'path': train_wav_path_list,
+				'goldStandard': train_goldStandard_list,
 			  	'transcript': train_transcript_list,
+			  	'ipa_transcript': train_ipa_transcript_list,
 			  	'duration': train_dur_list})
 
 	train_output.to_csv(output_path + level + '_train_' + str(i) + '.csv', index = False)
 
 	test_wav_path_list = [tok[0] for tok in test_data]
-	test_transcript_list = [tok[1] for tok in test_data]
+	test_goldStandard_list = [tok[1] for tok in test_data]
+	test_transcript_list = [tok[2] for tok in test_data]
+	test_ipa_transcript_list = [tok[3] for tok in test_data]
 	test_dur_list = [tok[-1] for tok in test_data]
 
 	test_output = pd.DataFrame({'path': test_wav_path_list,
+				'goldStandard': test_goldStandard_list,
 			  	'transcript': test_transcript_list,
+			  	'ipa_transcript': test_ipa_transcript_list,
 			  	'duration': test_dur_list})
 
 	test_output.to_csv(output_path + level + '_test_' + str(i) + '.csv', index = False)

@@ -55,20 +55,20 @@ class DataCollatorCTCWithPadding:
 	padding: Union[bool, str] = True
 
 	def __call__(self, features: List[Dict[str, Union[List[int], torch.Tensor]]]) -> Dict[str, torch.Tensor]:
-		input_features = [{"input_values": feature["input_values"]} for feature in features]
+		input_features = [{"input_features": feature["input_features"]} for feature in features]
 		label_features = [{"input_ids": feature["labels"]} for feature in features]
 
-		batch = self.processor.pad(
+		batch = self.processor.feature_extractor.pad(
 			input_features,
 			padding=self.padding,
 			return_tensors="pt",
 		)
-		with self.processor.as_target_processor():
-			labels_batch = self.processor.pad(
-				label_features,
-				padding=self.padding,
-				return_tensors="pt",
-			)
+	#	with self.processor.as_target_processor():
+		labels_batch = self.processor.tokenizer.pad(
+			label_features,
+			padding=self.padding,
+			return_tensors="pt",
+		)
 
 		labels = labels_batch["input_ids"].masked_fill(labels_batch.attention_mask.ne(1), -100)
 		batch["labels"] = labels
@@ -182,18 +182,21 @@ def train(data_path, train_data, test_data, pretrained_model, seed):
 	for v, k in vocab_dict.items():
 		print(v, k)
 
+	repo_name = f'asr_model/random/{seed}/{pretrained_model}/'
+	print(f"Model will be saved to: {repo_name}")
+
+	if not os.path.exists(repo_name):
+		os.makedirs(repo_name)
+
 	with open(data_path + 'random/' + seed + '/' + pretrained_model + '/vocab.json', 'w', encoding="utf-8") as vocab_file:
 		json.dump(vocab_dict, vocab_file, ensure_ascii=False)
 	
+	for f in os.listdir(data_path + 'random/' + seed + '/' + pretrained_model + '/'):
+		print(f)
+
 	## Creation of the tokeniser
 	print("Setting up tokenizer...")
 	tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(data_path + 'random/' + seed + '/' + pretrained_model + '/', unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
-	
-	repo_name = f'asr_model/random/{seed}/{pretrained_model}/'
-	print(f"Model will be saved to: {repo_name}")
-	
-	if not os.path.exists(repo_name):
-		os.makedirs(repo_name)
 		
 	tokenizer.save_pretrained(repo_name)
 
@@ -222,11 +225,13 @@ def train(data_path, train_data, test_data, pretrained_model, seed):
 
 	def prepare_dataset(batch):
 		audio = batch["audio"]
-		batch["input_values"] = processor(audio["array"], sampling_rate=audio["sampling_rate"]).input_values[0]
-		batch["input_length"] = len(batch["input_values"])
+		batch["input_features"] = processor(audio["array"], sampling_rate=audio["sampling_rate"]).input_features[0]
+		batch["input_length"] = len(batch["input_features"])
 		
-		with processor.as_target_processor():
-			batch["labels"] = processor(batch["sentence"]).input_ids
+	#	with processor.as_target_processor():
+		batch["labels"] = processor(text=batch["sentence"]).input_ids
+
+    #	batch["labels"] = processor(text=batch["sentence"]).input_ids
 		return batch
 
 	## Setting up data for training
@@ -244,19 +249,19 @@ def train(data_path, train_data, test_data, pretrained_model, seed):
 	print("Preparing model...")
 	## Training
 	model = Wav2Vec2BertForCTC.from_pretrained(
-    "facebook/w2v-bert-2.0",
-    attention_dropout=0.0,
-    hidden_dropout=0.0,
-    feat_proj_dropout=0.0,
-    mask_time_prob=0.05,
-    layerdrop=0.0,
-    ctc_loss_reduction="mean",
-    add_adapter=True,
-    pad_token_id=processor.tokenizer.pad_token_id,
-    vocab_size=len(processor.tokenizer),
+	"facebook/w2v-bert-2.0",
+	attention_dropout=0.0,
+	hidden_dropout=0.0,
+	feat_proj_dropout=0.0,
+	mask_time_prob=0.05,
+	layerdrop=0.0,
+	ctc_loss_reduction="mean",
+	add_adapter=True,
+	pad_token_id=processor.tokenizer.pad_token_id,
+	vocab_size=len(processor.tokenizer),
 )
 	model.config.ctc_zero_infinity = True
-	model.freeze_feature_extractor()
+#	model.freeze_feature_extractor()
 	
 	from transformers import TrainingArguments
 
@@ -332,9 +337,9 @@ def evaluate_with_pyctcdecode(model_path, test_data, vocab_dict, lm_path=None):
 				print(f"Copied {file} to checkpoint directory")
 
 	# Load model and processor
-	model = AutoModelForCTC.from_pretrained(checkpoint_path).to("cuda")
-	processor = Wav2Vec2Processor.from_pretrained(checkpoint_path)
-	
+	model = Wav2Vec2BertForCTC.from_pretrained(checkpoint_path).to("cuda")
+	processor = Wav2Vec2BertProcessor.from_pretrained(checkpoint_path)
+
 	# Build decoder - use processor vocabulary to match model
 	vocab = processor.tokenizer.get_vocab()
 	# Sort by token ID to match model output order
@@ -379,7 +384,7 @@ def evaluate_with_pyctcdecode(model_path, test_data, vocab_dict, lm_path=None):
 			signal = [np.average(signal[0], axis=1)]
 		
 		# Get model predictions
-		inputs = processor(signal, return_tensors="pt", padding=True, sampling_rate=16000).input_values.to("cuda")
+		inputs = processor(signal, return_tensors="pt", padding=True, sampling_rate=16000).input_features.to("cuda")
 		
 		with torch.no_grad():
 			logits = model(inputs).logits
@@ -458,12 +463,12 @@ def main():
 	pretrained_model = args.pretrained_model
 
 	# Create directories
-	try:
-		if not args.skip_training:
-			os.system(f'rm -r {data_path}random/{seed}/*')
-			print('Removed old models')
-	except:
-		pass
+#	try:
+#		if not args.skip_training:
+#			os.system(f'rm -r {data_path}random/{seed}/*')
+#			print('Removed old models')
+#	except:
+#		pass
 
 	for dir_path in [f'{data_path}random/', f'{data_path}random/{seed}']:
 		if not os.path.exists(dir_path):
@@ -486,7 +491,7 @@ def main():
 		model_path = repo_name
 	else:
 		# Load existing vocab for evaluation only
-		with open('vocab.json', 'r') as f:
+		with open(data_path + 'random/' + seed + '/' + pretrained_model + '/vocab.json', 'r') as f:
 			vocab_dict = json.load(f)
 		print("Skipping training, loading existing model...")
 
@@ -500,4 +505,6 @@ def main():
 if __name__ == "__main__":
 	main()
 	print("Script finished running")
+
+
 

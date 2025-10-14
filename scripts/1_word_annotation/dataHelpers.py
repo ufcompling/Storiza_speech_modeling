@@ -1,13 +1,41 @@
 import re
 from collections import defaultdict
-import os
+import os, json
 from functools import lru_cache
 from typing import Dict, List, Tuple, Any
 from pydub import AudioSegment
 import statistics
+import pandas as pd
 
 sec_to_ms = 1000
 website_prefix = 'https://2025storiza.michaelbennie.org/audio_clips/'
+
+# Loading IPA dictionary constructed from CMU dictionary and Wiktionary
+EN_IPA_DICT = "processed_annotations/full_en_dict.json"
+with open(EN_IPA_DICT, "r", encoding = "utf-8") as f:
+	en_ipa_dict = json.load(f)
+ 
+# Loading information about user id of each child and their grade
+STORY_META_CSV = os.path.join("processed_annotations/story.xlsx")
+story_meta_data = pd.read_excel(STORY_META_CSV)
+story_id_list = story_meta_data['__id__'].tolist()
+grade_list = story_meta_data['grade'].tolist()
+userID_list = story_meta_data['userId (matches the uid in the recording file name)'].tolist()
+userID_grade_dict = {}
+for i in range(len(userID_list)):
+  userID_grade_dict[story_id_list[i] + ' ' + userID_list[i]] = grade_list[i]
+
+
+# For mixed errors, we map the error category for consistency
+error_map = {
+    'Grammatical': 'Grammatical Error',
+    'Orthographic Sub.': 'Orthographic Error',
+    'Phonological': 'Phonological Error',
+    'Run-on': 'Run-on Word',
+    'Structural': 'Structural Error',
+    'Visual Tracking': 'Visual Tracking Error',
+    'Contraction/Shortening': 'Correct'
+}
 
 def storiza_URL_to_timestamps(url: str) -> list[float, float]:
 	filename = url[len(website_prefix):]
@@ -61,6 +89,8 @@ def clean_ipa(ipa_list: List[str]) -> List[str]:
 		s = s.replace("[", "")
 	if "]" in s:
 		s = s.replace("]", "")
+	if "\"" in s:
+		s = s.replace("\"", "")
 
 	# 2) remove tie bars so affricates become plain digraphs (e.g., t͡s -> ts, d͜z -> dz)
 	#    U+0361 COMBINING DOUBLE INVERTED BREVE (͡), U+035C COMBINING DOUBLE BREVE BELOW (͜)
@@ -113,26 +143,78 @@ def clean_ipa(ipa_list: List[str]) -> List[str]:
 	if 'ɝ' in s:
 		s = s.replace('ɝ', 'ɜɹ')
 
+	# Diacritics
+	if "ʰ" in s:
+		s = s.replace("ʰ", '')
+	if "ˈ" in s:
+		s = s.replace("ˈ", '')
+	if "ˌ" in s:
+		s = s.replace("ˌ", '')
+	if "ː" in s:
+		s = s.replace("ː", '')
+	if "̃" in s:
+		s = s.replace("̃", '')
+	if "̈" in s:
+		s = s.replace("̈", '')
+	if "̚" in s:
+		s = s.replace("̚", '')
+	if "̩" in s:
+		s = s.replace("̩", '')
+	if "̰" in s:
+		s = s.replace("̰", '')
+	if "̚" in s:
+		s = s.replace("̚", '')
+
+	# Changing some vowels
+	if 'ɐ' in s:
+		index_list = []
+		for i in range(len(s)):
+			phoneme = s[i]
+			if phoneme == 'ɐ':
+				index_list.append(i)
+	
+		# ɐ followed by ɪ --> a
+		# ɐ followed by ʊ --> a
+		# ɐ (elsewhere) --> ɑ
+		s = list(s)
+		follow_check = 0 
+		for idx in index_list:
+			try:
+				next_phoneme = index_list[idx+1]
+				if next_phoneme == 'ɪ' or next_phoneme == 'ʊ':
+					print(s)
+					s[idx] = 'a'
+					follow_check += 1
+			except:
+				pass
+		if follow_check == 0:
+			for idx in index_list:
+				s[idx] = 'ɑ'
+		s = ' '.join(s)
+
+	if 'ɒ' in s:
+		s = s.replace('ɒ', 'ɑ')
+
 	return [s]
 
 def decide_actual_production(error_category: str, intended: str, produced: str, ipa: List[str]) -> str:
 	if error_category == 'Correct': #bruh
-		return intended
+		return intended, 'word'
 	if intended and not produced and not ipa:
-		return intended
+		return intended, 'word'
 	if intended and not produced and ipa:
-		return ipa[0]
+		return ipa[0], 'ipa'
 	if intended and produced and not ipa:
-		return produced
+		return produced, 'word'
 	if intended and produced and ipa:
-		return produced
+		return produced, 'word'
 	if (not intended) and (not produced) and ipa:
-		return ipa[0]
+		return ipa[0], 'ipa'
 	if (not intended) and produced and not ipa:
-		return produced
+		return produced, 'word'
 	if (not intended) and produced and ipa:
-		return produced
-	return ''
+		return produced, 'word'
+	return '', ''
 
 
 def parse_grouped_results(annotations_block: Dict[str, Any], goldStandard: str, original_audio_name: str) -> Dict[str, Dict[str, Any]]:
@@ -156,7 +238,8 @@ def parse_grouped_results(annotations_block: Dict[str, Any], goldStandard: str, 
 		"comments": [],
 		"goldStandard": goldStandard,
 		"original_audio_name": original_audio_name,
-		"actual_production": ''
+		"actual_production": '',
+		"actual_ipa": ''
 	})
 
 	for r in result:
@@ -257,32 +340,62 @@ def sorted_word_rows_from_grouped(
 		):
 			annotator = info.get("annotator")
 			labels = info.get("error_labels", [])
-
+			intended = ' '.join(info.get("intended_words", []))
+			produced = ' '.join(info.get("produced_word", []))
 			ipa = clean_ipa(info.get("IPA", []))
+
 			try:
-				if "rose" in annotator and "Stutter" not in labels:
-				  if '...' in ipa[0]:
-					ipa[0] = ipa[0].replace('...', '|')
-				  elif '..' in ipa[0]:
-					ipa[0] = ipa[0].replace('..', '|')
-				  elif '.' in ipa[0]:
-					ipa[0] = ipa[0].replace('.', '|')
+				if "Broken Word" in labels:
+					if "rose" in annotator and "Stutter" not in labels:
+						if '...' in ipa[0]:
+							ipa[0] = ipa[0].replace('...', '|')
+						elif '..' in ipa[0]:
+							ipa[0] = ipa[0].replace('..', '|')
+						elif '.' in ipa[0]:
+							ipa[0] = ipa[0].replace('.', '|')
+
+						if produced != '':
+							if '...' in produced:
+							  produced = produced.replace('...', '|')
+							elif '..' in produced:
+							  produced = produced.replace('..', '|')
+							elif '.' in produced:
+							  produced = produced.replace('.', '|')
 			except:
 				pass
 
-			intended = ' '.join(info.get("intended_words", []))
-			produced = ' '.join(info.get("produced_word", []))
-			if produced != '':
-				if '...' in produced:
-				  produced = produced.replace('...', '|')
-				elif '..' in produced:
-				  produced = produced.replace('..', '|')
-				elif '.' in produced:
-				  produced = produced.replace('.', '|')
+			## Check if produced word has incorrect forms
+			if "(" in produced:
+				print('PRODUCED WORD has incorrect form:', produced, task_id, intended)
+			if "unintelligible" in produced:
+				print('PRODUCED WORD has incorrect form:', produced, task_id, intended)
+			if " " in produced:
+				print('PRODUCED WORD is more than one word:', produced, ipa, task_id, intended)
+
+			## Check if IPA has incorrect forms
+			if ipa != []:
+				if "\"" in ipa[0]:
+					print('IPA has incorrect form:', actual, ipa[0], task_id, intended)
+
 
 			error_category = info.get("error_category", '')
 
-			actual = decide_actual_production(error_category, intended, produced, ipa)
+			actual, form = decide_actual_production(error_category, intended, produced, ipa)
+
+			actual_ipa = ''
+			if form == 'ipa':
+				actual_ipa = actual
+			elif form != '':
+				if ipa != []:
+					actual_ipa = ipa[0]
+				else:
+					try:
+						actual_ipa = en_ipa_dict[actual.lower()]
+					except:
+						try:
+							actual_ipa = en_ipa_dict[actual]
+						except:
+							print("DID NOT FIND IPA FOR THIS WORD:", actual, task_id, intended, produced, ipa)
 
 			rows.append({
 				"task_id": task_id,
@@ -297,7 +410,8 @@ def sorted_word_rows_from_grouped(
 				"comments": " | ".join(info.get("comments", [])),
 				"goldStandard": info.get("goldStandard"),
 				"original_audio_name": info.get("original_audio_name"),
-				"actual_production": actual
+				"actual_production": actual,
+				"actual_ipa": actual_ipa
 			})
 	return sorted(rows, key=lambda x: (x["start"] is None, x["start"]))
 
@@ -363,20 +477,42 @@ def build_segments_and_rows(
 	# Sentence-level collectors
 	sentence_segments_path_list: List[str] = []
 	sentence_segments_transcript_list: List[str] = []
+	sentence_segments_intended_words_list: List[str] = []
+	sentence_segments_ipa_transcript_list: List[str] = []
+	sentence_segments_intended_words_list: List[str] = [] ## For later on analyzing word omission
 	sentence_segments_goldstandard_list: List[str] = []
+	sentence_segments_child_list: List[str] = []
+	sentence_segments_grade_list: List[str] = []
+	sentence_segments_error_category_list: List[str] = []
+	sentence_segments_error_labels_list: List[str] = []
+
+	# Re-constructing utterance window
+	utterance_start_time_list = []
+	utterance_end_time_list = []
+	utterance_closestart_time_list = []
+	utterance_closeend_time_list = []
 
 	# Word-level collectors
 	word_segments_path_list: List[str] = []
 	word_segments_transcript_list: List[str] = []
+	word_segments_ipa_transcript_list: List[str] = []
 	word_segments_intended_words_list: List[str] = []
 	word_segments_produced_words_list: List[str] = []
 	word_segments_IPA_list: List[str] = []
 	word_segments_error_category_list: List[str] = []
 	word_segments_error_labels_list: List[List[str]] = []
+	word_segments_child_list: List[str] = []
+	word_segments_grade_list: List[str] = []
 
 	# N-gram collectors
 	word_segments_ngram_path_list: List[str] = []
 	word_segments_ngram_transcript_list: List[str] = []
+	word_segments_ngram_ipa_transcript_list: List[str] = []
+	word_segments_ngram_child_list: List[str] = []
+	word_segments_ngram_grade_list: List[str] = []
+
+	# List of original audio names
+	original_audio_name_list: List[str] = []
 
 	# Compare close vs original time; this is because annotations of word-level tasks might exceed the timestamps of the sentence-level annotations.
 	start_time_diff_list: List[float] = []
@@ -404,6 +540,9 @@ def build_segments_and_rows(
 			goldStandard = "You won't escape me, Jake! Nate shouted, his voice a booming echo in the forest."
 
 		original_audio_name = item.get("data", {}).get("original_audio_name")
+		userID = original_audio_name.split('_')[1]
+		storyID = original_audio_name.split('_')[3]
+		grade = userID_grade_dict[storyID + ' ' + userID]
 		story_audio_goldstandard_sentences[original_audio_name].append(goldStandard)
 
 		sentence_level_id = item.get("data", {}).get("sentence_level_id")
@@ -437,6 +576,7 @@ def build_segments_and_rows(
 				os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename)
 			)
 
+
 		# Use the latest annotation block
 		ann0 = annotations[0]
 		grouped = parse_grouped_results(ann0, goldStandard, original_audio_name)
@@ -449,7 +589,12 @@ def build_segments_and_rows(
 		rows.extend(sorted_word_segments)
 
 		# Collecting word-level segments and transcripts
+		intended_words_list: List[str] = []
 		produced_utterance: List[str] = []
+		produced_ipa_sequence: List[str] = [] ## Full transcripts in IPA form
+		error_category_sequence: List[str] = []
+		error_labels_sequence: List[str] = []
+
 		actual_buffered_audio_url = item.get("data", {}).get("audio", '')
 
 		relative_start = max(0, utterance_start_time - word_offset)
@@ -467,7 +612,25 @@ def build_segments_and_rows(
 				end_time = info['end'] + relative_start
 				start_time_list.append(start_time)
 				end_time_list.append(end_time)
-				produced_utterance.append(info['actual_production'])
+				if 'Parental Aid' not in info['error_labels']:
+					intended_words_list.append(info['intended_words'].strip())
+				produced_utterance.append(info['actual_production'].strip())
+				produced_ipa_sequence.append(info['actual_ipa'])
+				word_error_category = info['error_category']
+				word_error_labels = info['error_labels']
+				if '+' in word_error_category:
+					word_error_category = word_error_category.split('+')
+					modified_word_error_category = []
+					for category in word_error_category:
+						try:
+							category = error_map[category]
+						except:
+							category = category
+						modified_word_error_category.append(category)
+					word_error_category = '+'.join(modified_word_error_category)
+				error_category_sequence.append(word_error_category)
+				if word_error_labels:
+					error_labels_sequence.append('+'.join(word_error_labels))
 
 				# Export per-word
 				word_output_filename = f"{original_audio_name.split('.')[0]}_{task_id}_word_segment_{z}.wav"
@@ -481,23 +644,32 @@ def build_segments_and_rows(
 				# Collect paths & metadata
 				word_segments_path_list.append(os.path.join(WORD_SEGMENTS_DIR, word_output_filename))
 				word_segments_transcript_list.append(info['actual_production'])
+				word_segments_ipa_transcript_list.append(info['actual_ipa'])
 				word_segments_intended_words_list.append(info['intended_words'])
 				word_segments_produced_words_list.append(info['produced_word'])
 				ipa_str = ''.join(info['IPA'][0]) if info['IPA'] else ''
 				word_segments_IPA_list.append(ipa_str)
 				word_segments_error_category_list.append(info['error_category'])
 				word_segments_error_labels_list.append(info['error_labels'])
+				word_segments_child_list.append(userID)
+				word_segments_grade_list.append(grade)
 
 				# N-gram window
 				if NGRAM == 'full':
 					ngram_start_time = start_time_list[0]
 					ngram_end_time = end_time
 					ngram_produced_utterance = ' '.join(produced_utterance)
+					ngram_produced_ipa_sequence = ' '.join(produced_ipa_sequence)
 				else:
 					n = int(NGRAM)
-					ngram_start_time = start_time_list[-n]
+					ngram_start_time = ''
+					try:
+						ngram_start_time = start_time_list[-n]
+					except:
+						ngram_start_time = start_time_list[0]
 					ngram_end_time = end_time
 					ngram_produced_utterance = ' '.join(produced_utterance[-n:])
+					ngram_produced_ipa_sequence = ' '.join(produced_ipa_sequence[-n:])
 
 				ngram_output_filename = f"{original_audio_name.split('.')[0]}_{task_id}_ngram_segment_{z}.wav"
 				export_clip(
@@ -508,14 +680,19 @@ def build_segments_and_rows(
 				)
 				word_segments_ngram_path_list.append(os.path.join(WORD_SEGMENTS_NGRAM_DIR, ngram_output_filename))
 				word_segments_ngram_transcript_list.append(ngram_produced_utterance)
+				word_segments_ngram_ipa_transcript_list.append(ngram_produced_ipa_sequence)
+				word_segments_ngram_child_list.append(userID)
+				word_segments_ngram_grade_list.append(grade)
 
 		# If no pre-computed utterance window, derive from word spans and export
+		close_utterance_start_time = ''
+		close_utterance_end_time = ''
 		if sentence_level_id is not None:
 			dstart, dend = derive_sentence_window_from_words(sorted_word_segments, audio_duration_s, buffer_s=0.010)
 			if dstart is not None and dend is not None:
 				close_utterance_start_time = dstart+relative_start
 				close_utterance_end_time = dend+relative_start
-
+				
 				utterance_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment_close.wav"
 				if debug and (close_utterance_start_time < utterance_start_time or close_utterance_end_time > utterance_end_time):
 				#    print("Warning: the word segments extend past the original sentence audio")
@@ -547,7 +724,21 @@ def build_segments_and_rows(
 			sentence_segments_path_list.append(os.path.join(SENTENCE_SEGMENTS_DIR, utterance_output_filename))
 			produced_sentence = ' '.join(produced_utterance)
 			sentence_segments_transcript_list.append(produced_sentence)
+			intended_words_sequence = ' '.join(intended_words_list)
+			sentence_segments_intended_words_list.append(intended_words_sequence)
+			produced_sentence_ipa = ' '.join(produced_ipa_sequence)
+			sentence_segments_ipa_transcript_list.append(produced_sentence_ipa)
 			sentence_segments_goldstandard_list.append(goldStandard)
+			sentence_segments_child_list.append(userID)
+			sentence_segments_grade_list.append(grade)
+			sentence_segments_error_category_list.append(error_category_sequence)
+			sentence_segments_error_labels_list.append(error_labels_sequence)
+			original_audio_name_list.append(original_audio_name)
+			utterance_start_time_list.append(utterance_start_time)
+			utterance_end_time_list.append(utterance_end_time)
+			utterance_closestart_time_list.append(close_utterance_start_time)
+			utterance_closeend_time_list.append(close_utterance_end_time)
+
 			story_audio_produced_sentences[original_audio_name].append(produced_sentence)
 
 		# Assertions
@@ -558,7 +749,6 @@ def build_segments_and_rows(
 		assert len(word_segments_ngram_path_list) == len(word_segments_ngram_transcript_list), "Mismatch in n-gram word segments and transcripts length"
 		assert len(word_segments_ngram_path_list) == len(word_segments_error_category_list), "Mismatch in n-gram word segments and word segments length"
 
-	print(start_time_diff_list)
 	print(f'Start time difference: mean {statistics.mean(start_time_diff_list)} std: {statistics.stdev(start_time_diff_list)}')
 	print(f'End time difference: mean {statistics.mean(end_time_diff_list)} std: {statistics.stdev(end_time_diff_list)}')
 	print('\n')
@@ -573,16 +763,33 @@ def build_segments_and_rows(
 		rows,
 		sentence_segments_path_list,
 		sentence_segments_transcript_list,
+		sentence_segments_intended_words_list,
+		sentence_segments_ipa_transcript_list,
 		sentence_segments_goldstandard_list,
+		sentence_segments_child_list,
+		sentence_segments_grade_list,
+		sentence_segments_error_category_list,
+		sentence_segments_error_labels_list,
 		word_segments_path_list,
 		word_segments_transcript_list,
+		word_segments_ipa_transcript_list,
 		word_segments_intended_words_list,
 		word_segments_produced_words_list,
 		word_segments_IPA_list,
 		word_segments_error_category_list,
 		word_segments_error_labels_list,
+		word_segments_child_list,
+		word_segments_grade_list,
 		word_segments_ngram_path_list,
 		word_segments_ngram_transcript_list,
+		word_segments_ngram_ipa_transcript_list,
+		word_segments_ngram_child_list,
+		word_segments_ngram_grade_list,
+		utterance_start_time_list,
+		utterance_end_time_list,
+		utterance_closestart_time_list,
+		utterance_closeend_time_list,
+		original_audio_name_list,
 		error_dict,
 	)
 
