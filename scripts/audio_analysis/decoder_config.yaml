@@ -1,0 +1,5 @@
+beam: 1600
+retry_beam: 3600
+phone_beam: 800
+prune_interval: 300
+acoustic_scale: 0.3

@@ -6,17 +6,17 @@ from typing import Dict, List, Tuple, Any
 from pydub import AudioSegment
 import statistics
 import pandas as pd
-
+from directoryConfig import *
 sec_to_ms = 1000
 website_prefix = 'https://2025storiza.michaelbennie.org/audio_clips/'
 
 # Loading IPA dictionary constructed from CMU dictionary and Wiktionary
-EN_IPA_DICT = "processed_annotations/full_en_dict.json"
+
 with open(EN_IPA_DICT, "r", encoding = "utf-8") as f:
 	en_ipa_dict = json.load(f)
  
 # Loading information about user id of each child and their grade
-STORY_META_CSV = os.path.join("processed_annotations/story.xlsx")
+
 story_meta_data = pd.read_excel(STORY_META_CSV)
 story_id_list = story_meta_data['__id__'].tolist()
 grade_list = story_meta_data['grade'].tolist()
