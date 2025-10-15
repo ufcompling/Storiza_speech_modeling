@@ -1,0 +1,31 @@
+Reviewed IPA Cases Summary:
+
+Most of the following consonants were replaced with a different consonant (often one phonemic to English):
+β (replaced with b)
+ʋ (replaced with ɹ)
+ʑ (replaced with ʒ)
+
+These diacritics were largely removed as most of these features would be phonetic rather than phonemic in English. Most used the diacritics correctly; however, they were used inconsistently across annotators (as some transcribed phonemically, and others phonetically). Cases where diacritics were used to represent unexpected sounds in English were preserved (ie nasalization with no neighboring nasal).
+
+ʰ
+ˌ
+ˈ
+̚
+ɪ̈
+Nasalization 
+̰'
+'
+
+/ɐ/ and /ɒ/ were used instead of /ɑ/ in the majority of cases. Occasional instances of the prior two phonemes also being used instead of /ɔ/.
+
+There were two cases where transcriptions were given for parental aid, which we no longer require. The IPA in these cases could be removed. (These cases are marked with the comment: "IPA should be removed. Word said correctly, and is spoken by the parent")
+
+Alveolar taps/flaps were split: for taps/flaps occurring where a /t/ or /d/ occurs in a real English word (either produced as a substitution or a reading of an intended word), the tap was replaced with its respective phoneme. However, in cases where the tap occurs in a nonsense/ambiguous word (with no way of knowing if the original phoneme was /t/ or /d/), it was preserved.
+
+[ɫ] removed and replaced with /l/, phonetic feature and not phonemic
+
+All /ɜ/ kept - part of a common r-controlled vowel in English. However, we would probably need to use ɜɹ instead of ɝ across all cases if we want to be consistent (unless we want to use ɝ instead).
+
+
+
+

@@ -26,15 +26,16 @@ from dataHelpers import *
 
 # ---- Processing parameters ----
 SAMPLE_RATE = 4800
-NGRAM = "full"  # or an int (e.g., 3) if you want fixed-length n-grams
+NGRAM = 3 #"full"  # or an int (e.g., 3) if you want fixed-length n-grams
 DEBUG = True #used to print additional data
 
-
-
-# ----------- Load JSON ----------
+# ----------- Load JSON for annotations ----------
 with open(JSON_PATH, "r", encoding="utf-8") as f:
     data = json.load(f)
 
+print('\n')
+print('JSON_PATH', JSON_PATH)
+print('\n')
 #============= (1) Examining JSON ================
 #if DEBUG:
     # ---------- Print First Example ----------
@@ -63,7 +64,6 @@ sentenceLabels_original_audio_timestamps = load_sentence_label_timestamps(SENTEN
 #        print(sentenceLabels_original_audio_timestamps[""])
 #    except KeyError:
 #        print("item not found")
-
 
 #============= (3) Collecting annotated intended/goldstandard sentences for each audio================
 
@@ -98,6 +98,8 @@ try:
 except OSError as e:
     print(f"Error creating directory '{WORD_SEGMENTS_NGRAM_DIR}': {e}")
 
+# Utterance window
+utterance_windows = pd.DataFrame(columns=['utterance_output_filename', 'close_utterance_start_time', 'close_utterance_end_time', 'utterance_start_time', 'utterance_end_time'])
 
 #============= (4) Extract & Format Data================
 
@@ -112,16 +114,33 @@ for annotator in ANNOTATOR_LIST:
     rows,
     sentence_segments_path_list,
     sentence_segments_transcript_list,
+    sentence_segments_intended_words_list,
+    sentence_segments_ipa_transcript_list,
     sentence_segments_goldstandard_list,
+    sentence_segments_child_list,
+    sentence_segments_grade_list,
+    sentence_segments_error_category_list,
+    sentence_segments_error_labels_list,
     word_segments_path_list,
     word_segments_transcript_list,
+    word_segments_ipa_transcript_list,
     word_segments_intended_words_list,
     word_segments_produced_words_list,
     word_segments_IPA_list,
     word_segments_error_category_list,
     word_segments_error_labels_list,
+    word_segments_child_list,
+    word_segments_grade_list,
     word_segments_ngram_path_list,
     word_segments_ngram_transcript_list,
+    word_segments_ngram_ipa_transcript_list,
+    word_segments_ngram_child_list,
+    word_segments_ngram_grade_list,
+    utterance_start_time_list,
+    utterance_end_time_list,
+    utterance_closestart_time_list,
+    utterance_closeend_time_list,
+    original_audio_name_list,
     error_dict,
 ) = build_segments_and_rows(
     data=data,
@@ -136,7 +155,6 @@ for annotator in ANNOTATOR_LIST:
     sample_rate=SAMPLE_RATE,
     debug=DEBUG
 )
-
 
 # Generating story-level datasets for modeling
 story_data_path_list=[]
@@ -155,34 +173,56 @@ story_data.to_csv(STORY_LEVEL_CSV, index=False, encoding="utf-8")
 # Generating sentence-level datasets for modeling
 sentence_segments_data['Path'] = sentence_segments_path_list
 sentence_segments_data['Transcript'] = sentence_segments_transcript_list
+sentence_segments_data['Intended Words'] = sentence_segments_intended_words_list
+sentence_segments_data['IPA_Transcript'] = sentence_segments_ipa_transcript_list
 sentence_segments_data['goldStandard'] = sentence_segments_goldstandard_list
+sentence_segments_data['Child'] = sentence_segments_child_list
+sentence_segments_data['Grade'] = sentence_segments_grade_list
+sentence_segments_data['Error Category Seq'] = sentence_segments_error_category_list
+sentence_segments_data['Error Labels Seq'] = sentence_segments_error_labels_list
+sentence_segments_data['Start Time'] = utterance_closestart_time_list
+sentence_segments_data['End Time'] = utterance_closeend_time_list
+sentence_segments_data['original_audio_name'] = original_audio_name_list
 sentence_segments_data.to_csv(SENTENCE_LEVEL_CSV, index=False, encoding="utf-8")
 
 # Generating word-level datasets for modeling
 word_segments_data['Path'] = word_segments_path_list
 word_segments_data['Transcript'] = word_segments_transcript_list
+word_segments_data['IPA_Transcript'] = word_segments_ipa_transcript_list
 word_segments_data['Intended Words'] = word_segments_intended_words_list
 word_segments_data['Produced Words'] = word_segments_produced_words_list
 word_segments_data['IPA'] = word_segments_IPA_list
 word_segments_data['Error Category'] = word_segments_error_category_list
 word_segments_data['Error Labels'] = word_segments_error_labels_list
+word_segments_data['Child'] = word_segments_child_list
+word_segments_data['Grade'] = word_segments_grade_list
 word_segments_data.to_csv(WORD_LEVEL_CSV, index=False, encoding="utf-8")
 
 word_segments_data_ngram['Path'] = word_segments_ngram_path_list
 word_segments_data_ngram['Transcript'] = word_segments_ngram_transcript_list
+word_segments_data_ngram['IPA_Transcript'] = word_segments_ngram_ipa_transcript_list
 word_segments_data_ngram['Intended Words'] = word_segments_intended_words_list
 word_segments_data_ngram['Produced Words'] = word_segments_produced_words_list
 word_segments_data_ngram['IPA'] = word_segments_IPA_list
 word_segments_data_ngram['Error Category'] = word_segments_error_category_list
 word_segments_data_ngram['Error Labels'] = word_segments_error_labels_list
+word_segments_data_ngram['Child'] = word_segments_ngram_child_list
+word_segments_data['Grade'] = word_segments_ngram_grade_list
 word_segments_data_ngram.to_csv(WORD_LEVEL_NGRAM_CSV, index=False, encoding="utf-8")
+
+utterance_windows['utterance_output_filename'] = sentence_segments_path_list
+utterance_windows['close_utterance_start_time'] = utterance_closestart_time_list
+utterance_windows['close_utterance_end_time'] = utterance_closeend_time_list
+utterance_windows['utterance_start_time'] = utterance_start_time_list
+utterance_windows['utterance_end_time'] = utterance_end_time_list
+utterance_windows.to_csv(UTTERANCE_WINDOWS_CSV, index=False, encoding='utf-8')
 
 # -------- Write Full word-level data --------
 
 task_intended_words_dict = {}
 
 with open(FORMATTED_FULL_CSV, "w", newline="", encoding="utf-8") as f: #bruh, 400 lines
-    writer = csv.DictWriter(f, fieldnames=["task_id", "annotator", "start", "end", "intended_words", "produced_word", "IPA", "error_category", "error_labels", "comments", "goldStandard", "original_audio_name", "actual_production"])
+    writer = csv.DictWriter(f, fieldnames=["task_id", "annotator", "start", "end", "intended_words", "produced_word", "IPA", "error_category", "error_labels", "comments", "goldStandard", "original_audio_name", "actual_production", "actual_ipa"])
     writer.writeheader()
     for row in rows:   
         comments = row.get("comments")
@@ -457,11 +497,7 @@ print(f"✅ Done! Output saved to: {FORMATTED_FULL_CSV}")
 
 for annotator in ANNOTATOR_LIST:
   with open(FIXES_DIR + ANNOTATOR_MAP[annotator] + '_fixes.txt', 'w') as f:
-    print(FIXES_DIR + ANNOTATOR_MAP[annotator] + '_fixes.txt',)
     annotation_errors = error_dict[annotator]
-    print(annotator)
-    print(annotation_errors)
-    print('\n')
     try:
       sorted_annotation_errors = sorted(annotation_errors, key=lambda x: x[0])
     except:

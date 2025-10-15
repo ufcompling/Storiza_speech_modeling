@@ -9,9 +9,9 @@ ANNOTATOR_MAP = {
   "hamern@ufl.edu": "Noah",
   "katherine.ball@ufl.edu": "Katherine",
   "benjaminmcneill@ufl.edu": "Benji",
-  "landonturner@ufl.edu": "Landon",
+  "landonturner@ufl.edu": "Landon_ufl",
   "isabelapizarro@ufl.edu": "Isabela",
-  "landonturnr@gmail.com": "Landon"
+  "landonturnr@gmail.com": "Landon_gmail"
 }
 
 #------------ Don't Change ----------------------
