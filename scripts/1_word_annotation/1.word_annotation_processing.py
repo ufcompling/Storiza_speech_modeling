@@ -19,10 +19,17 @@ from pydub import AudioSegment
 import soundfile as sf
 
 
-from directoryConfig import  *
+
 from annotatorInformation import *
 from jsonHelpers import *
 from dataHelpers import *
+
+
+#Comment this out and uncomment the below line if you want the other config
+from directoryConfig_Michael import *
+#from directoryConfig import  *
+
+
 
 # ---- Processing parameters ----
 SAMPLE_RATE = 4800

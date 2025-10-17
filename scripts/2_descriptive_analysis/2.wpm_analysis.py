@@ -513,10 +513,10 @@ def main(*,
 # --- Predefined parameters (edit here) ---------------------------------------
 
 if __name__ == "__main__":
-#    ROOT_DIR = os.path.join("..", "..")
-#    PROCESSED_DIR = os.path.join(ROOT_DIR, "processed_data")
-#    PROCESSED_ANNOTATON_DIR = os.path.join(ROOT_DIR, "processed_annotations")
-    PROCESSED_DIR = ("processed_annotations")
+    ROOT_DIR = os.path.join("..", "..")
+    PROCESSED_DIR = os.path.join(ROOT_DIR, "processed_data")
+    PROCESSED_ANNOTATON_DIR = os.path.join(ROOT_DIR, "processed_annotations")
+#     PROCESSED_DIR = ("processed_annotations")
 
     STORIES = Path(os.path.join(PROCESSED_DIR, "story_lengths.tsv"))
     META = Path(os.path.join(PROCESSED_DIR, "story.xlsx"))

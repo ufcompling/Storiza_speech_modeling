@@ -6,9 +6,15 @@ from typing import Dict, List, Tuple, Any
 from pydub import AudioSegment
 import statistics
 import pandas as pd
-from directoryConfig import *
 sec_to_ms = 1000
 website_prefix = 'https://2025storiza.michaelbennie.org/audio_clips/'
+
+
+#Comment this out and uncomment the below line if you want the other config
+from directoryConfig_Michael import *
+#from directoryConfig import  *
+
+
 
 # Loading IPA dictionary constructed from CMU dictionary and Wiktionary
 
@@ -717,7 +723,7 @@ def build_segments_and_rows(
 
 				original_output_filename = original_audio_name.split('.')[0] + f"_{task_id}_sentence_segment.wav"
 				if original_output_filename in os.listdir(SENTENCE_SEGMENTS_DIR):
-					os.system('rm ' + SENTENCE_SEGMENTS_DIR + '/' + original_output_filename)
+					os.remove(SENTENCE_SEGMENTS_DIR + '/' + original_output_filename)
 
 		# Sentence-level collection
 		if produced_utterance:

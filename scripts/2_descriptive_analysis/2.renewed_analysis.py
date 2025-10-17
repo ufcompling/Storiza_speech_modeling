@@ -400,9 +400,9 @@ def wpm_main(processed_dir: Path):
     print(f"saved wpm histogram to: {os.path.join(figs_dir, 'stacked_hist_wpm_by_grade.png')}")
 
 if __name__ == "__main__":
-#    ROOT_DIR = os.path.join("..", "..")
-#    PROCESSED_DIR = os.path.join(ROOT_DIR, "processed_annotations")
-    PROCESSED_DIR = "processed_annotations"
+    ROOT_DIR = os.path.join("..", "..")
+    PROCESSED_DIR = os.path.join(ROOT_DIR, "processed_annotations")
+#     PROCESSED_DIR = "processed_annotations"
     os.makedirs(PROCESSED_DIR, exist_ok=True)
 
     
