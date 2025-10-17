@@ -1,6 +1,6 @@
 test	stat	p_value	chi2	dof
-Kruskal avg_story_length_by_speaker across grades	46.88735687205473	3.6727437948255147e-10		
-Kruskal avg_summed_utterance_length_by_speaker across grades	46.88735687205473	3.6727437948255147e-10		
-Chi2 avg_story_length_by_speaker by grade		2.8572622975034066e-13	78.75326426151048	9.0
-Chi2 avg_summed_utterance_length_by_speaker by grade		2.8572622975034066e-13	78.75326426151048	9.0
+Kruskal avg_story_length_by_speaker across grades	6.080062832908133	0.10777930528422756		
+Kruskal avg_summed_utterance_length_by_speaker across grades	4.669746542433166	0.1976398911644024		
+Chi2 avg_story_length_by_speaker by grade		5.710774617271991e-20	112.01632033875794	9.0
+Chi2 avg_summed_utterance_length_by_speaker by grade		7.98022488005803e-19	106.38784082672566	9.0
 Chi2 grade speaker counts equal proportions		0.07583783879926195	6.879544159544159	3.0

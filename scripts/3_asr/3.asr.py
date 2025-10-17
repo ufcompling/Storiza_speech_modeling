@@ -117,12 +117,16 @@ def get_data_reg(data_path, file, pretrained_model, seed, cmu_audio=False, child
 			words = words + transcript.split()
 			entry["sentence"] = transcript.replace("\n", " ")				
 			entry["audio"] = {"sampling_rate" : samplerate, "array" : signal}
+			entry["duration"] = duration
 			data.append(entry)
 		except Exception as e:
 			print(f"Error processing {wav_path}: {e}")
 			continue
 
+	data = sorted(data, key=lambda entry: entry['duration'])
 	print(f"Total duration: {duration:.2f} seconds")
+	for entry in data:
+		print(entry["duration"])
 
 	if 'train' in file:
 		## Getting text data for training n-gram LM
