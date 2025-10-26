@@ -120,7 +120,7 @@ def main():
     # the batch combiner to append the base dictionary. (No `export_dictionary` needed.)
     aligner = MFAIpaAligner(
         acoustic_model="english_mfa",
-        dictionary="/home/michaelbennie/Documents/MFA/pretrained_models/dictionary/english_mfa.dict",
+        dictionary="/home/michaelbennie/Documents/MFA/pretrained_models/dictionary/english_us_mfa.dict",
         mfa_bin="mfa",
         temp_root="./temp",
         speaker_characters=36,         # exact length of your UID prefix
