@@ -5,7 +5,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from copy import deepcopy
 
 # ------------------------------
-# Constants from your labeling UI
+# Constants from labeling UI
 # ------------------------------
 
 TOP_LEVEL_LABELS = [
@@ -96,4 +96,50 @@ FROMNAME_TO_SPECINV = {
     "StructuralErrorType": STRUCT_SPEC,
     "VisualTrackingErrorType": VISUAL_SPEC,
     "DisfluencyErrorType": DISFLUENCY_SPEC,
+}
+
+
+# ---- mapping from specific -> parent top-level ----
+SPECIFIC_TO_TOPLEVEL: Dict[str, str] = {
+    # Phonological
+    "Consonant Substitution": "Phonological Error",
+    "Vowel Substitution": "Phonological Error",
+    "Consonant Omission": "Phonological Error",
+    "Vowel Omission": "Phonological Error",
+    "Consonant Insertion": "Phonological Error",
+    "Vowel Insertion": "Phonological Error",
+    "Misplaced Stress": "Phonological Error",
+
+    # Orthographic
+    "Letter Reversal Substitution": "Orthographic Error",
+    "Left Right Tracking Substitution": "Orthographic Error",
+    "Phonological Substitution": "Orthographic Error",
+    "Contextual Substitution": "Orthographic Error",
+    "Unrelated Substitution": "Orthographic Error",
+
+    # Grammatical
+    "Omission": "Grammatical Error",
+    "Substitution": "Grammatical Error",
+    "Insertion": "Grammatical Error",
+
+    # Structural
+    "Word Omission": "Structural Error",
+    "Word Insertion": "Structural Error",
+
+    # Visual Tracking
+    "Skip Line": "Visual Tracking Error",
+    "Backtrack": "Visual Tracking Error",
+    "Wrong Order": "Visual Tracking Error",
+
+    # Disfluency
+    "Stutter": "Disfluency Error",
+    "Word Repetition": "Disfluency Error",
+    "Self Correction": "Disfluency Error",   # aka 'Repair'
+    "Broken Word": "Disfluency Error",
+    "Prolongation": "Disfluency Error",
+    "Interjection": "Disfluency Error",
+    "Unfilled Pause": "Disfluency Error",
+    "Parent Correction": "Disfluency Error",
+    "Parental Aid": "Disfluency Error",
+    "Run-on Word": "Disfluency Error",
 }

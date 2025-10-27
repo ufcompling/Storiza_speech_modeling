@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 import json
 from datetime import datetime
@@ -134,6 +135,157 @@ def _build_general_and_specific_for_region(region_items: List[Dict[str, Any]]) -
 
     return general_map, specific_map
 
+
+def clean_ipa(ipa_list: List[str]) -> List[str]:
+    """
+    Normalizes the first IPA string in `ipa_list`:
+      - strips slashes
+      - removes tie-bars in affricates (͡, ͜) and collapses to digraphs
+      - expands rhotized vowels (precomposed ɚ/ɝ and vowel + ˞) to vowel + ɹ
+      - converts "upwards r" variants to ɹ
+
+    Returns a single-element list with the cleaned string (mirrors original API).
+    """
+    if not ipa_list:
+        return ipa_list
+
+    s = ipa_list[0]
+
+    # 1) strip surrounding slashes if present
+    if "/" in s:
+        s = s.replace("/", "")
+    if "[" in s:
+        s = s.replace("[", "")
+    if "]" in s:
+        s = s.replace("]", "")
+    if "\"" in s:
+        s = s.replace("\"", "")
+
+    # 2) remove tie bars so affricates become plain digraphs (e.g., t͡s -> ts, d͜z -> dz)
+    #    U+0361 COMBINING DOUBLE INVERTED BREVE (͡), U+035C COMBINING DOUBLE BREVE BELOW (͜)
+    s = s.replace("\u0361", "").replace("\u035C", "")
+
+    # Keep explicit affricate simplifications too (no-op now, but harmless and explicit)
+    s = s.replace("d͡ʒ", "dʒ").replace("t͡ʃ", "tʃ")
+
+    # 3) RHOTICS: expand rhotized vowels to vowel + ɹ
+    #    - precomposed: ɚ -> əɹ, ɝ -> ɜɹ (approximation that preserves rhoticity)
+    s = s.replace("ɚ", "əɹ").replace("ɝ", "ɜɹ")
+
+    #    - combining rhotic hook: any vowel + ˞ (U+02DE) -> vowel + ɹ
+    #      We'll match a fairly broad set of IPA vowel symbols.
+    IPA_VOWELS = "aeiou" \
+                 "ɑæɐəɜɛeɪioɔuʊʌɒœøɯyɨʉɘɵɤʏɶɞ"
+
+    # replace VOWEL + ˞ with VOWEL + ɹ
+    s = re.sub(fr"([{IPA_VOWELS}])\u02DE", r"\1ɹ", s)
+
+    #    - superscript r after a vowel: V + ʳ -> V + ɹ
+    s = re.sub(fr"([{IPA_VOWELS}])\u02B3", r"\1ɹ", s)  # U+02B3 = ʳ
+
+    # 4) Normalize all "upwards r" variants to ɹ
+    #    (choose what you want included here; this set is intentionally broad)
+    R_VARIANTS = [
+        "r",  # alveolar trill
+        "ɻ",  # retroflex approximant
+        "ʳ",  # modifier letter small r (superscript)
+        "ʴ",  # modifier letter small turned r with hook
+    ]
+    for rv in R_VARIANTS:
+        s = s.replace(rv, "ɹ")
+
+    # 5) (optional) seperate any accidental double ɹɹ that could arise from replacements (rare)
+    s = re.sub("ɹ{2,}", "ɹɹ.", s)
+
+    # Consolidating prolongation
+    if 'ː' in s:
+        s = s.replace('ː', ':')
+
+    if 'β' in s:
+        s = s.replace('β', 'b')
+    if 'ʋ' in s:
+        s = s.replace('ʋ', 'ɹ')
+    if 'ʑ' in s:
+        s = s.replace('ʑ', 'ʒ')
+    if 'ɫ' in s:
+        s = s.replace('ɫ', 'l')
+    if 'ɝ' in s:
+        s = s.replace('ɝ', 'ɜɹ')
+
+    # Diacritics
+    if "ʰ" in s:
+        s = s.replace("ʰ", '')
+    if "ˈ" in s:
+        s = s.replace("ˈ", '')
+    if "ˌ" in s:
+        s = s.replace("ˌ", '')
+    if "ː" in s:
+        s = s.replace("ː", '')
+    if "̃" in s:
+        s = s.replace("̃", '')
+    if "̈" in s:
+        s = s.replace("̈", '')
+    if "̚" in s:
+        s = s.replace("̚", '')
+    if "̩" in s:
+        s = s.replace("̩", '')
+    if "̰" in s:
+        s = s.replace("̰", '')
+    if "̚" in s:
+        s = s.replace("̚", '')
+
+    # Changing some vowels
+    if 'ɐ' in s:
+        index_list = []
+        for i in range(len(s)):
+            phoneme = s[i]
+            if phoneme == 'ɐ':
+                index_list.append(i)
+
+        # ɐ followed by ɪ --> a
+        # ɐ followed by ʊ --> a
+        # ɐ (elsewhere) --> ɑ
+        s = list(s)
+        follow_check = 0
+        for idx in index_list:
+            try:
+                next_phoneme = index_list[idx + 1]
+                if next_phoneme == 'ɪ' or next_phoneme == 'ʊ':
+                    print(s)
+                    s[idx] = 'a'
+                    follow_check += 1
+            except:
+                pass
+        if follow_check == 0:
+            for idx in index_list:
+                s[idx] = 'ɑ'
+        s = ' '.join(s)
+
+    if 'ɒ' in s:
+        s = s.replace('ɒ', 'ɑ')
+
+    return [s]
+
+
+def decide_actual_production(error_category: str, intended: str, produced: str, ipa: List[str]) -> str:
+	if error_category == 'Correct': #bruh
+		return intended, 'word'
+	if intended and not produced and not ipa:
+		return intended, 'word'
+	if intended and not produced and ipa:
+		return ipa[0], 'ipa'
+	if intended and produced and not ipa:
+		return produced, 'word'
+	if intended and produced and ipa:
+		return produced, 'word'
+	if (not intended) and (not produced) and ipa:
+		return ipa[0], 'ipa'
+	if (not intended) and produced and not ipa:
+		return produced, 'word'
+	if (not intended) and produced and ipa:
+		return produced, 'word'
+	return '', ''
+
 def _transform_annotation(annotation: Dict[str, Any]) -> Dict[str, Any]:
     res = annotation.get("result", [])
     regional = _group_results_by_region_id(res)
@@ -187,9 +339,9 @@ def _transform_annotation(annotation: Dict[str, Any]) -> Dict[str, Any]:
         if pw is not None:
             item_out["produced_word"] = pw
         if ipa is not None:
-            item_out["mispronunciation_ipa"] = ipa
+            item_out["mispronunciation_ipa"] = clean_ipa([ipa])[0]
         if iws is not None:
-            item_out["intended_words"] = iws
+            item_out["intended_word"] = iws
 
         simplified_items.append(item_out)
 
@@ -218,6 +370,8 @@ def group_annotations(
     result_mapping: Dict[str, List[Dict[str, Any]]] = {}
 
     for audio, task_list in by_audio.items():
+
+        task_list = _dedupe_by_completed_by_keep_newest(task_list)
 
         if keep_only_audio_with_x_annotations is not None: # this is used to only keep the items that were fully annotated//a
             task_list = _filter_by_count(task_list, keep_only_audio_with_x_annotations)
@@ -258,7 +412,11 @@ def join_and_concat(
     Value for each shared key = concatenation of the lists a[k] + b[k].
     """
     shared = set(a.keys()) & set(b.keys())
-    return {k: list(a[k]) + list(b[k]) for k in shared}
+    out={k: list(a[k]) + list(b[k]) for k in shared}
+    for key in out.keys():
+        out[key]=_dedupe_by_completed_by_keep_newest(out[key])
+
+    return out
 
 def union_concat(
     a: Dict[str, List[Dict[str, Any]]],
@@ -270,8 +428,36 @@ def union_concat(
     out: Dict[str, List[Dict[str, Any]]] = {}
     for k in set(a.keys()) | set(b.keys()):
         out[k] = list(a.get(k, [])) + list(b.get(k, []))
+
+    for key in out.keys():
+        out[key]=_dedupe_by_completed_by_keep_newest(out[key])
+
+
     return out
 
+def _dedupe_by_completed_by_keep_newest(anns: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Collapse multiple annotations from the same 'completed_by' dict to the newest one.
+    Equality is based on the full completed_by dict (same values inside).
+    Recency uses 'created_at' (falls back to id when needed).
+    """
+    buckets: Dict[str, Dict[str, Any]] = {}
+
+    def _recency_key(a: Dict[str, Any]) -> Tuple[datetime, int]:
+        dt = _parse_dt(a.get("created_at"))
+        # id is a stable secondary tiebreaker if timestamps tie or are missing
+        aid = int(a.get("id", 0)) if isinstance(a.get("id"), (int, str)) and str(a.get("id")).isdigit() else 0
+        return (dt, aid)
+
+    for a in anns:
+        key_obj = a.get("completed_by", {})
+        # stable string key from the entire dict content
+        key_str = json.dumps(key_obj, sort_keys=True)
+        best = buckets.get(key_str)
+        if best is None or _recency_key(a) > _recency_key(best):
+            buckets[key_str] = a
+
+    return list(buckets.values())
 
 
 def generate_cross_annotation_dicts(
@@ -280,7 +466,7 @@ def generate_cross_annotation_dicts(
     annotations_original_json_path: str = "../../processed_annotations/export_157618_project-157618-at-2025-10-26-23-01-53494ae5.json",
 ):
     """
-    Runs the grouping with your specified filters, prints a summary table,
+    Runs the grouping with  specified filters, prints a summary table,
     and returns a dict of all four mappings.
     """
     cross_annotations_v2 = group_annotations(
@@ -288,22 +474,33 @@ def generate_cross_annotation_dicts(
         leave_x_newest_annotations=1,
         keep_only_audio_with_x_annotations=3,
     )
+    for key in cross_annotations_v2.keys():
+        cross_annotations_v2[key]=_dedupe_by_completed_by_keep_newest(cross_annotations_v2[key])
+
 
     cross_annotations_v1 = group_annotations(
         annotations_v1_json_path,
         leave_x_newest_annotations=1,
         keep_only_audio_with_x_annotations=2,
     )
+    for key in cross_annotations_v1.keys():
+        cross_annotations_v1[key]=_dedupe_by_completed_by_keep_newest(cross_annotations_v1[key])
 
     original_annotations = group_annotations(
         annotations_original_json_path,
     )
+    for key in original_annotations.keys():
+        original_annotations[key]=_dedupe_by_completed_by_keep_newest(original_annotations[key])
+
 
     original_annotations_accidentally_crossed = group_annotations(
         annotations_original_json_path,
         leave_x_newest_annotations=2,
         keep_only_audio_with_x_annotations=2,  # ones that *were* accidentally cross-annotated
     )
+    for key in original_annotations_accidentally_crossed.keys():
+        original_annotations_accidentally_crossed[key]=_dedupe_by_completed_by_keep_newest(original_annotations_accidentally_crossed[key])
+
 
     _print_heading("Number of audios annotated and total annotations for each (raw groups)")
     _summary_line("cross_annotations_v1", cross_annotations_v1)
@@ -342,7 +539,10 @@ def generate_combined_cross_annotation_dicts(
     # Build the requested combined views using INNER JOINS with original
     # 1) all_cross = inner join( union(v1, v2), original )
     merged_v1_v2 = union_concat(cross_annotations_v1, cross_annotations_v2)
+
+
     all_cross = join_and_concat(merged_v1_v2, original_annotations)
+
 
     # 2) v1_cross = inner join( v1, original )
     v1_cross = join_and_concat(cross_annotations_v1, original_annotations)
@@ -352,14 +552,16 @@ def generate_combined_cross_annotation_dicts(
 
     v1_v2_overlap = join_and_concat(join_and_concat(cross_annotations_v1, cross_annotations_v2),original_annotations)
 
-
+    # 4) combination of all cross-annotations
+    all_cross_overlap = union_concat(all_cross, original_annotations_accidentally_crossed)
 
     _print_heading("Combined stats")
     _summary_line("all_cross ( (v1 ∪ v2) ⋂ original )", all_cross)
     _summary_line("v1_cross ( v1 ⋂ original )", v1_cross)
     _summary_line("v2_cross ( v2 ⋂ original )", v2_cross)
     _summary_line("overlap in cross annotations ( v2 ⋂ v1 ⋂ original)", v1_v2_overlap)
-    _summary_line("original_annotations_accidentally_crossed", original_annotations_accidentally_crossed)
+    _summary_line("original with >1 annotations", original_annotations_accidentally_crossed)
+    _summary_line("all_cross_overlap (((v1 ∪ v2) ⋂ original) ∪ original with >1 annotations )", all_cross_overlap)
     print("-" * 59)
 
     return {
@@ -368,6 +570,7 @@ def generate_combined_cross_annotation_dicts(
         "v2_cross": v2_cross,
         "accidentally_crossed": original_annotations_accidentally_crossed,
         "v1_v2_overlap": v1_v2_overlap,
+        "all_cross_overlap": all_cross_overlap,
     }
 
 if __name__ == "__main__":
