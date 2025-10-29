@@ -244,6 +244,24 @@ def compute_alpha_u_or_cu_stats_for_dataset(
     return overall_mean, overall_sd, mean_mat, sd_mat, annotators
 
 
+def _color_alpha(value: float) -> str:
+    """Return colored string based on Krippendorff's alpha interpretation thresholds."""
+    if np.isnan(value):
+        return "\033[90mNaN\033[0m"  # gray for missing values
+    if value >= 0.80:
+        color = "\033[92m"  # green
+    elif value >= 0.67:
+        color = "\033[93m"  # yellow
+    elif value >= 0:
+        color = "\033[91m"  # red
+    else:
+        color = "\033[94m"  # dark blue
+    return f"{color}{value:.4f}\033[0m"
+
+
+
+
+
 # Convenience runners mirroring your γ “combinations”
 def compute_all_alpha_u_and_cu_summaries(
     data_dict: Dict[str, list],
@@ -270,8 +288,10 @@ def compute_all_alpha_u_and_cu_summaries(
         out[name] = {
             "alpha_u": (overall_mean, overall_sd, mean_mat, sd_mat, annotators),
         }
-    for mean in means:
-        print(mean[0]+":",mean[1])
+
+    means= sorted(means, key=lambda x: x[1], reverse=True)
+    for name, mean in means:
+        print(f"{name}: {_color_alpha(mean)}")
     return out
 
 if __name__ =="__main__":
@@ -280,7 +300,7 @@ if __name__ =="__main__":
 
     # Or one setting + heatmaps
     overall_m, overall_s, pair_m, pair_s, labels = compute_alpha_u_or_cu_stats_for_dataset(
-        data, TOP_LEVEL_LABELS, "general_label_type"
+        data, ORTHO_SPEC, "specific_label_type"
     )
     print(overall_m,overall_s)
 
