@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 import json
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Counter
 from copy import deepcopy
 from Labels import *
 
@@ -83,7 +83,11 @@ def _build_general_and_specific_for_region(region_items: List[Dict[str, Any]]) -
     top_level_selected: List[str] = []
     for it in region_items:
         if it.get("type") == "labels" and it.get("from_name") == "WordAnnotation":
-            top_level_selected.extend(it.get("value", {}).get("labels", []))
+            label_vals=it.get("value", {}).get("labels", [])
+            for i in range(len(label_vals)):
+                if label_vals[i] in NAME_NORMALIZING_MAP:
+                    label_vals[i]=NAME_NORMALIZING_MAP[label_vals[i]]
+            top_level_selected.extend(label_vals)
 
     if top_level_selected and "Mixed Error" not in top_level_selected:
         for lab in top_level_selected:
@@ -94,6 +98,9 @@ def _build_general_and_specific_for_region(region_items: List[Dict[str, Any]]) -
         if it.get("type") == "choices":
             from_name = it.get("from_name")
             selected = it.get("value", {}).get("choices", [])
+            for i in range(len(selected)):
+                if selected[i] in NAME_NORMALIZING_MAP:
+                    selected[i]=NAME_NORMALIZING_MAP[selected[i]]
             for s in selected:
                 if s in specific_map:
                     specific_map[s] = True
@@ -330,6 +337,7 @@ def _transform_annotation(annotation: Dict[str, Any]) -> Dict[str, Any]:
             },
         }
 
+
         iw = _merge_text(intended_words)
         pw = _merge_text(produced_words)
         ipa = _merge_text(ipa_vals)
@@ -516,7 +524,47 @@ def generate_cross_annotation_dicts(
         "original_annotations_accidentally_crossed": original_annotations_accidentally_crossed,
     }
 
+def _count_labels(mapping: Dict[str, List[Dict[str, Any]]]) -> Tuple[Counter, Counter]:
+    """
+    Count how many times each general and specific label occurs
+    across all annotations in this mapping.
+    """
+    general_counter = Counter()
+    specific_counter = Counter()
 
+    for audio, annotations in mapping.items():
+        for ann in annotations:
+            for region in ann.get("result", []):
+                gen_labels = region.get("general_label_type", {})
+                spec_labels = region.get("specific_label_type", {})
+
+                gen_names = gen_labels.get("labels", [])
+                gen_selected = gen_labels.get("selected", [])
+                spec_names = spec_labels.get("labels", [])
+                spec_selected = spec_labels.get("selected", [])
+
+                for name, selected in zip(gen_names, gen_selected):
+                    if selected:
+                        general_counter[name] += 1
+
+                for name, selected in zip(spec_names, spec_selected):
+                    if selected:
+                        specific_counter[name] += 1
+
+    return general_counter, specific_counter
+
+
+def _print_label_counts(name: str, mapping: Dict[str, List[Dict[str, Any]]]) -> None:
+    general_counts, specific_counts = _count_labels(mapping)
+    print(f"\nLabel distribution for {name}:")
+    print("-" * (25 + len(name)))
+    print("Top-level (general) labels:")
+    for label, count in general_counts.most_common():
+        print(f"  {label:<30} {count}")
+    print("\nSpecific labels:")
+    for label, count in specific_counts.most_common():
+        print(f"  {label:<30} {count}")
+    print("-" * (25 + len(name)))
 
 
 def generate_combined_cross_annotation_dicts(
@@ -563,6 +611,13 @@ def generate_combined_cross_annotation_dicts(
     _summary_line("original with >1 annotations", original_annotations_accidentally_crossed)
     _summary_line("all_cross_overlap (((v1 ∪ v2) ⋂ original) ∪ original with >1 annotations )", all_cross_overlap)
     print("-" * 59)
+
+    # --- Label frequency summaries ---
+    for name, mapping in {
+        "all_cross_overlap": all_cross_overlap,
+    }.items():
+        _print_label_counts(name, mapping)
+
 
     return {
         "all_cross": all_cross,

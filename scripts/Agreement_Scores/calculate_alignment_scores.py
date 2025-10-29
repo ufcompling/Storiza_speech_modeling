@@ -281,12 +281,13 @@ def plot_triangular_heatmap(
     labels: List[str],
     title: str,
     null_label: str = "NA",
-    value_format: str = "{:.3f}",
+    value_format: str = "{:.2f}",
     save_path: Optional[str] = None,
     show: bool = True,
 ):
     """
-    Render a bottom-right triangular heatmap (strictly lower triangle; diagonal excluded).
+    Render a bottom-left triangular heatmap (strictly lower triangle; diagonal excluded).
+    The top-right triangle and diagonal are blacked out.
     Any cell matching the null value is rendered with a blank text label.
     - matrix: 2D list of floats or None (or 'NA' strings)
     - labels: annotator labels for both axes
@@ -315,23 +316,46 @@ def plot_triangular_heatmap(
                         arr[i, j] = np.nan
 
     # Mask the upper triangle AND the diagonal (keep strictly lower triangle only)
+    # The original code already does this by setting values to np.nan for j >= i
+    # We will use this to draw the bottom-left triangle.
+
+    # Create a new array for plotting the "blacked out" effect
+    plot_data = np.copy(arr)
     for i in range(n):
         for j in range(n):
             if j >= i:  # above or on diagonal
-                arr[i, j] = np.nan
+                plot_data[i, j] = -1  # A distinct value to represent "blacked out" in the colormap
 
-    # Use a masked array so NaNs are not rendered at all
-    data = np.ma.masked_invalid(arr)
+    # Use a masked array for text annotations, so NaNs are not rendered at all
+    text_data = np.ma.masked_invalid(arr)
 
-    fig, ax = plt.subplots()
-    im = ax.imshow(data, interpolation="nearest")
-    ax.set_title(title)
+    # Make the figure larger
+    fig, ax = plt.subplots(figsize=(10, 8)) # Increased figure size
+
+    # Define a colormap for the heatmap.
+    # We want the values in the lower triangle to have a color gradient,
+    # and the upper triangle/diagonal to be black.
+    # The default 'viridis' colormap goes from yellow (high) to purple (low).
+    # We will ensure -1 maps to black.
+    cmap = plt.cm.viridis
+    cmap.set_bad(color='white')  # NaNs (unfilled cells in the lower triangle) will be white
+    cmap.set_under(color='black') # Values less than vmin will be black.
+                                  # We'll set vmin to 0 so -1 becomes black.
+
+    # Determine the range for the actual data (excluding -1 and NaNs)
+    valid_data = arr[~np.isnan(arr)]
+    vmin = np.min(valid_data) if valid_data.size > 0 else 0
+    vmax = np.max(valid_data) if valid_data.size > 0 else 1
+
+    im = ax.imshow(plot_data, interpolation="nearest", cmap=cmap, vmin=-0.5, vmax=vmax) # Adjusted vmin to ensure -1 is below the threshold
+
+    ax.set_title(title, fontsize=16) # Increased title font size
     ax.set_xticks(np.arange(n))
     ax.set_yticks(np.arange(n))
 
     labels = [l.split("@")[0] for l in labels]  # quick way to get names
-    ax.set_xticklabels(labels, rotation=90)
-    ax.set_yticklabels(labels)
+    ax.set_xticklabels(labels, rotation=45, ha='right', fontsize=12) # Increased label font size and rotation for better readability
+    ax.set_yticklabels(labels, fontsize=12) # Increased label font size
 
     # Add text annotations for strictly lower triangle only (exclude diagonal)
     for i in range(n):
@@ -347,16 +371,15 @@ def plot_triangular_heatmap(
                     text = ""
             else:
                 text = ""
-            ax.text(j, i, text, ha="center", va="center")
+            ax.text(j, i, text, ha="center", va="center", color="black", fontsize=10) # Increased text font size
 
     fig.tight_layout()
 
     if save_path:
-        fig.savefig(save_path, bbox_inches="tight", dpi=200)
+        fig.savefig(save_path, bbox_inches="tight", dpi=300) # Increased DPI for higher resolution
     if show:
         plt.show()
     return fig, ax
-
 
 
 def calculate_matrix_average(M: List[List[Optional[float]]]) -> Optional[float]:

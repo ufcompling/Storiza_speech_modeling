@@ -14,7 +14,7 @@ from krippendorff_unitized_alpha import (
 )
 
 from GenerateGroupedAnnotations import generate_combined_cross_annotation_dicts
-from Labels import TOP_LEVEL_LABELS, ORTHO_SPEC, GRAM_SPEC, STRUCT_SPEC, VISUAL_SPEC, RUNON_SPEC
+from Labels import TOP_LEVEL_LABELS, ORTHO_SPEC, GRAM_SPEC, STRUCT_SPEC, VISUAL_SPEC, RUNON_SPEC, FULL_COMBOS
 from calculate_alignment_scores import plot_triangular_heatmap
 
 
@@ -206,7 +206,7 @@ def compute_alpha_u_or_cu_stats_for_dataset(
     pair_accum: Dict[Tuple[int, int], List[float]] = {(i, j): [] for i in range(N) for j in range(N) if i > j}
 
     # Per-audio computations
-    for _, audio_annotations in tqdm(data_dict.items(), desc=f"alpha-u"):
+    for _, audio_annotations in data_dict.items():
         # overall (all present)
         coders_present = sorted({ann["completed_by"]["email"].split("@")[0] for ann in audio_annotations})
         if len(coders_present) >= 2:
@@ -258,36 +258,20 @@ def compute_all_alpha_u_and_cu_summaries(
         ...
       }
     """
-    from Labels import TOP_LEVEL_LABELS, PHONO_SPEC, DISFLUENCY_SPEC, SPECIFIC_LABELS
 
-    combos = [
-        ("Top-level (general_label_type)", TOP_LEVEL_LABELS, "general_label_type"),
-        ("Phonological specifics", PHONO_SPEC, "specific_label_type"),
-        ("Orthographic specifics", ORTHO_SPEC, "specific_label_type"),
-        ("Grammatical specifics", GRAM_SPEC, "specific_label_type"),
-        ("Structural specifics", STRUCT_SPEC, "specific_label_type"),
-        ("Visual specifics", VISUAL_SPEC, "specific_label_type"),
-        ("Run-On specifics", RUNON_SPEC, "specific_label_type"),
-        ("Disfluency specifics", DISFLUENCY_SPEC, "specific_label_type"),
-        ("All specifics", SPECIFIC_LABELS, "specific_label_type"),
-        ("Intended word", ["intended_word"], None),
-        ("Produced word", ["produced_word"], None),
-        ("Mispronunciation IPA", ["mispronunciation_ipa"], None),
-    ]
 
     out: Dict[str, Dict[str, Tuple[float, float, List[List[Optional[float]]], List[List[Optional[float]]], List[str]]]] = {}
     means=[]
-    for name, target_values, subname in tqdm(combos):
+    for name, target_values, subname in tqdm(FULL_COMBOS):
         overall_mean, overall_sd, mean_mat, sd_mat, annotators=compute_alpha_u_or_cu_stats_for_dataset(
             data_dict, target_values, subname
         )
-        means.append(overall_mean)
+        means.append((name,overall_mean))
         out[name] = {
             "alpha_u": (overall_mean, overall_sd, mean_mat, sd_mat, annotators),
         }
-    means =[m for m in means if not np.isnan(m)]
-    print(means)
-    print("Overall mean:", np.mean(means))
+    for mean in means:
+        print(mean[0]+":",mean[1])
     return out
 
 if __name__ =="__main__":
@@ -296,7 +280,7 @@ if __name__ =="__main__":
 
     # Or one setting + heatmaps
     overall_m, overall_s, pair_m, pair_s, labels = compute_alpha_u_or_cu_stats_for_dataset(
-        data, ["intended_word"], None
+        data, TOP_LEVEL_LABELS, "general_label_type"
     )
     print(overall_m,overall_s)
 

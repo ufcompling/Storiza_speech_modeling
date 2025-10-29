@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from GenerateGroupedAnnotations import generate_combined_cross_annotation_dicts
 from Labels import TOP_LEVEL_LABELS
-from scripts.Agreement_Scores.calculate_scores import plot_triangular_heatmap
+from scripts.Agreement_Scores.calculate_alignment_scores import plot_triangular_heatmap
 
 
 # -------------------------------------------------------------------
@@ -361,12 +361,13 @@ def compute_all_gamma_summaries(
 
 
 if __name__ == "__main__":
+
+
+
     dicts = generate_combined_cross_annotation_dicts()
     data = dicts["all_cross_overlap"]
 
 
-    out=compute_all_gamma_summaries(data)
-    json.dump(out,open("all_gamma_summaries.json","w"))
 
 
     # Grab one audio’s annotation list
@@ -380,14 +381,16 @@ if __name__ == "__main__":
         blank_label="__NONE__"
     )
 
+    # 2) Overall γ across all annotators
+    overall = calculate_overall_gamma(continua_dict, alpha=1.0, beta=1.0, show_image=True)
+    print(f"Overall gamma (all annotators): {overall:.3f}")
+
+
     # 1) Pairwise γ
     pairwise = calculate_pairwise_agreement(continua_dict.copy(), alpha=1.0, beta=1.0)
     for pair, g in sorted(pairwise.items(), key=lambda x: tuple(sorted(x[0]))):
         print(f"{sorted(list(pair))}: gamma={g:.3f}")
 
-    # 2) Overall γ across all annotators
-    overall = calculate_overall_gamma(continua_dict, alpha=1.0, beta=1.0, show_image=True)
-    print(f"Overall gamma (all annotators): {overall:.3f}")
 
 
     overall_m, overall_s, pair_m, pair_s, labels = compute_gamma_stats_for_dataset(
@@ -399,3 +402,7 @@ if __name__ == "__main__":
     # Heatmap
     plot_triangular_heatmap(pair_m, labels, "Pairwise γ (mean)")
     plot_triangular_heatmap(pair_s, labels, "Pairwise γ (sd)")
+
+
+    out=compute_all_gamma_summaries(data)
+    json.dump(out,open("all_gamma_summaries.json","w"))

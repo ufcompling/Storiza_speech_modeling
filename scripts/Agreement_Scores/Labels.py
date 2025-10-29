@@ -36,7 +36,7 @@ PHONO_SPEC = [
 ]
 
 ORTHO_SPEC = [
-    "Letter Reversal Substitution",
+    "Letter Reversal",
     "Left Right Tracking Substitution",
     "Phonological Substitution",
     "Contextual Substitution",
@@ -52,7 +52,7 @@ VISUAL_SPEC = ["Skip Line", "Backtrack", "Wrong Order"]
 DISFLUENCY_SPEC = [
     "Stutter",
     "Word Repetition",
-    "Self Correction",
+    "Repair",
     "Broken Word",
     "Prolongation",
     "Interjection",
@@ -71,7 +71,6 @@ SPECIFIC_LABELS = (
     + STRUCT_SPEC
     + VISUAL_SPEC
     + DISFLUENCY_SPEC
-    + RUNON_SPEC
 )
 
 # Mapping from MixedErrorTaxonomy families to top-level labels
@@ -111,7 +110,7 @@ SPECIFIC_TO_TOPLEVEL: Dict[str, str] = {
     "Misplaced Stress": "Phonological Error",
 
     # Orthographic
-    "Letter Reversal Substitution": "Orthographic Error",
+    "Letter Reversal": "Orthographic Error",
     "Left Right Tracking Substitution": "Orthographic Error",
     "Phonological Substitution": "Orthographic Error",
     "Contextual Substitution": "Orthographic Error",
@@ -134,7 +133,7 @@ SPECIFIC_TO_TOPLEVEL: Dict[str, str] = {
     # Disfluency
     "Stutter": "Disfluency Error",
     "Word Repetition": "Disfluency Error",
-    "Self Correction": "Disfluency Error",   # aka 'Repair'
+    "Repair": "Disfluency Error",   # aka 'Self Correction'
     "Broken Word": "Disfluency Error",
     "Prolongation": "Disfluency Error",
     "Interjection": "Disfluency Error",
@@ -143,3 +142,61 @@ SPECIFIC_TO_TOPLEVEL: Dict[str, str] = {
     "Parental Aid": "Disfluency Error",
     "Run-on Word": "Disfluency Error",
 }
+
+NAME_NORMALIZING_MAP={
+    "Letter Reversal Substitution": "Letter Reversal"
+}
+
+# 1. Initial/Grouped Combos
+FULL_COMBOS = [
+    ("Top-level (general_label_type)", TOP_LEVEL_LABELS, "general_label_type"),
+    #All Specific label combined toghether
+    ("Phonological specifics combined", PHONO_SPEC, "specific_label_type"),
+    ("Orthographic specifics combined", ORTHO_SPEC, "specific_label_type"),
+    ("Grammatical specifics combined", GRAM_SPEC, "specific_label_type"),
+    ("Structural specifics combined", STRUCT_SPEC, "specific_label_type"),
+    ("Visual specifics combined", VISUAL_SPEC, "specific_label_type"),
+    ("Disfluency specifics combined", DISFLUENCY_SPEC, "specific_label_type"),
+    ("All specifics combined", SPECIFIC_LABELS, "specific_label_type"),
+    # Non-label attributes
+    ("Intended word", ["intended_word"], None),
+    ("Produced word", ["produced_word"], None),
+    ("Mispronunciation IPA", ["mispronunciation_ipa"], None),
+]
+
+# 2. Add individual Top-Level Labels
+for label in TOP_LEVEL_LABELS:
+    # Use a clear name for the individual label combo
+    combo_name = f"Individual Top: {label}"
+    FULL_COMBOS.append((combo_name, [label], "general_label_type"))
+
+# 3. Add individual specifics combined
+for label in PHONO_SPEC:
+    # Use a clear name for the individual phonological specific combo
+    combo_name = f"Individual Phono Spec: {label}"
+    FULL_COMBOS.append((combo_name, [label], "specific_label_type"))
+
+# Orthographic
+for label in ORTHO_SPEC:
+    combo_name = f"Individual Ortho Spec: {label}"
+    FULL_COMBOS.append((combo_name, [label], "specific_label_type"))
+
+# Grammatical
+for label in GRAM_SPEC:
+    combo_name = f"Individual Gram Spec: {label}"
+    FULL_COMBOS.append((combo_name, [label], "specific_label_type"))
+
+# Structural
+for label in STRUCT_SPEC:
+    combo_name = f"Individual Struct Spec: {label}"
+    FULL_COMBOS.append((combo_name, [label], "specific_label_type"))
+
+# Visual Tracking
+for label in VISUAL_SPEC:
+    combo_name = f"Individual Visual Spec: {label}"
+    FULL_COMBOS.append((combo_name, [label], "specific_label_type"))
+
+# Disfluency
+for label in DISFLUENCY_SPEC:
+    combo_name = f"Individual Disfluency Spec: {label}"
+    FULL_COMBOS.append((combo_name, [label], "specific_label_type"))
