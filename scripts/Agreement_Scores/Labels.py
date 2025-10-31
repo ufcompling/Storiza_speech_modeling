@@ -24,6 +24,21 @@ TOP_LEVEL_LABELS = [
     "Other",
 ]
 
+TOP_LEVEL_ERROR_LABELS = [
+    "Phonological Error",
+    "Orthographic Error",
+    "Grammatical Error",
+    "Structural Error",
+    "Visual Tracking Error",
+    "Disfluency Error",
+    "Whispering",
+    "Run-on",
+    "Contraction/Shortening",
+    "Unintelligible",
+    "Self Response",
+    "Other",
+]
+
 # Specific (error-type) labels
 PHONO_SPEC = [
     "Consonant Substitution",
@@ -56,7 +71,6 @@ DISFLUENCY_SPEC = [
     "Broken Word",
     "Prolongation",
     "Interjection",
-    "Unfilled Pause",
     "Parent Correction",
     "Parental Aid",
 ]
@@ -137,7 +151,6 @@ SPECIFIC_TO_TOPLEVEL: Dict[str, str] = {
     "Broken Word": "Disfluency Error",
     "Prolongation": "Disfluency Error",
     "Interjection": "Disfluency Error",
-    "Unfilled Pause": "Disfluency Error",
     "Parent Correction": "Disfluency Error",
     "Parental Aid": "Disfluency Error",
     "Run-on Word": "Disfluency Error",
@@ -150,6 +163,7 @@ NAME_NORMALIZING_MAP={
 # 1. Initial/Grouped Combos
 FULL_COMBOS = [
     ("Top-level (general_label_type)", TOP_LEVEL_LABELS, "general_label_type"),
+    ("Top-level (not including correct)", TOP_LEVEL_ERROR_LABELS, "general_label_type"),
     #All Specific label combined toghether
     ("Phonological specifics combined", PHONO_SPEC, "specific_label_type"),
     ("Orthographic specifics combined", ORTHO_SPEC, "specific_label_type"),
