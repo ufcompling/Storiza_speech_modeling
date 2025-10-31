@@ -300,7 +300,7 @@ if __name__ =="__main__":
 
     # Or one setting + heatmaps
     overall_m, overall_s, pair_m, pair_s, labels = compute_alpha_u_or_cu_stats_for_dataset(
-        data, ORTHO_SPEC, "specific_label_type"
+        data, ["Repair"], "specific_label_type"
     )
     print(overall_m,overall_s)
 
