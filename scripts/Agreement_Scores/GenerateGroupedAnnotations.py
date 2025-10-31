@@ -6,6 +6,11 @@ from typing import Dict, List, Any, Optional, Tuple, Counter
 from copy import deepcopy
 from Labels import *
 
+
+#Use this to change people's email values
+EMAIL_MAPPINGS = {"landonturnr@gmail.com":{'id': 82336, 'email': 'landonturner@ufl.edu', 'first_name': '', 'last_name': ''}}
+
+
 def _parse_dt(s: Optional[str]) -> datetime:
     if not s:
         return datetime(1970, 1, 1)
@@ -443,6 +448,9 @@ def union_concat(
 
     return out
 
+
+
+
 def _dedupe_by_completed_by_keep_newest(anns: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Collapse multiple annotations from the same 'completed_by' dict to the newest one.
@@ -459,6 +467,8 @@ def _dedupe_by_completed_by_keep_newest(anns: List[Dict[str, Any]]) -> List[Dict
 
     for a in anns:
         key_obj = a.get("completed_by", {})
+        if key_obj["email"] in EMAIL_MAPPINGS.keys():
+            a["completed_by"]=EMAIL_MAPPINGS[key_obj["email"]]
         # stable string key from the entire dict content
         key_str = json.dumps(key_obj, sort_keys=True)
         best = buckets.get(key_str)
@@ -471,7 +481,7 @@ def _dedupe_by_completed_by_keep_newest(anns: List[Dict[str, Any]]) -> List[Dict
 def generate_cross_annotation_dicts(
     annotations_v2_json_path: str = "../../processed_annotations/export_194012_project-194012-at-2025-10-26-23-02-5adfae3c.json",
     annotations_v1_json_path: str = "../../processed_annotations/export_178326_project-178326-at-2025-09-29-04-04-8271fa09.json",
-    annotations_original_json_path: str = "../../processed_annotations/export_157618_project-157618-at-2025-10-26-23-01-53494ae5.json",
+    annotations_original_json_path: str = "../../processed_annotations/export_157618_project-157618-at-2025-10-31-07-01-c6813584.json",
 ):
     """
     Runs the grouping with  specified filters, prints a summary table,
