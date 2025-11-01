@@ -540,7 +540,7 @@ if __name__ == "__main__":
 
     overall_m, overall_s, pair_m, pair_s, labels = compute_gamma_stats_for_dataset(
         data_dict=data,
-        target_values=ORTHO_SPEC,
+        target_values=["Repair"],
         subDictName="specific_label_type",
     )
 
@@ -548,7 +548,7 @@ if __name__ == "__main__":
     plot_triangular_heatmap(pair_m, labels, "Pairwise γ (mean)")
     plot_triangular_heatmap(pair_s, labels, "Pairwise γ (sd)")
 
-    json_out, audio_out = compute_all_gamma_summaries(data, max_workers=18)
+    json_out, audio_out = compute_all_gamma_summaries(data, max_workers=14)
 
     # save JSON (annotator-wise summaries per combo)
     with open("all_gamma_summaries.json", "w") as jf:

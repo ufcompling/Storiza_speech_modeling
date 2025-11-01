@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from GenerateGroupedAnnotations import generate_combined_cross_annotation_dicts
 
+
 # ---------------- Utilities ----------------
 
 def _get_annotator_id(ann: Dict[str, Any]) -> str:
@@ -22,6 +23,7 @@ def _get_annotator_id(ann: Dict[str, Any]) -> str:
         return str(user)
     # Final fallback: annotation id (not ideal, but prevents crashes)
     return f"ann_{ann.get('id', 'unknown')}"
+
 
 def _extract_intervals_from_annotation(ann: Dict[str, Any]) -> List[Tuple[float, float]]:
     """
@@ -43,6 +45,7 @@ def _extract_intervals_from_annotation(ann: Dict[str, Any]) -> List[Tuple[float,
             intervals.append((s, e))
     return intervals
 
+
 def _merge_intervals(intervals: List[Tuple[float, float]]) -> List[Tuple[float, float]]:
     """Merge overlapping intervals and return a normalized list."""
     if not intervals:
@@ -59,9 +62,11 @@ def _merge_intervals(intervals: List[Tuple[float, float]]) -> List[Tuple[float, 
     merged.append((cur_s, cur_e))
     return merged
 
+
 def _measure(intervals: List[Tuple[float, float]]) -> float:
     """Total duration covered by intervals (assumes disjoint)."""
     return sum(e - s for s, e in intervals)
+
 
 def _intersection_measure(a: List[Tuple[float, float]], b: List[Tuple[float, float]]) -> float:
     """Total overlap length between two (assumed merged) interval lists."""
@@ -81,6 +86,7 @@ def _intersection_measure(a: List[Tuple[float, float]], b: List[Tuple[float, flo
             j += 1
     return total
 
+
 def _tiou(a: List[Tuple[float, float]], b: List[Tuple[float, float]]) -> float:
     """
     Temporal IoU between two sets of intervals:
@@ -96,9 +102,11 @@ def _tiou(a: List[Tuple[float, float]], b: List[Tuple[float, float]]) -> float:
         return 0.0
     return inter / union
 
+
 # ---------------- Core computations ----------------
 
-def compute_pairwise_shared_counts(annotation_dict: Dict[str, List[Dict[str, Any]]]) -> Tuple[List[str], List[List[int]]]:
+def compute_pairwise_shared_counts(annotation_dict: Dict[str, List[Dict[str, Any]]]) -> Tuple[
+    List[str], List[List[int]]]:
     """
     For a dict: audio -> [annotations], compute how many audios each pair of annotators co-annotated.
     Returns (annotator_ids, matrix) where matrix[i][j] is count of shared audios.
@@ -138,7 +146,9 @@ def compute_pairwise_shared_counts(annotation_dict: Dict[str, List[Dict[str, Any
 
     return annotator_ids, M
 
-def compute_pairwise_average_tiou(annotation_dict: Dict[str, List[Dict[str, Any]]]) -> Tuple[List[str], List[List[Optional[float]]]]:
+
+def compute_pairwise_average_tiou(annotation_dict: Dict[str, List[Dict[str, Any]]]) -> Tuple[
+    List[str], List[List[Optional[float]]]]:
     """
     For a dict: audio -> [annotations], compute average pairwise temporal IoU per annotator pair.
     Returns (annotator_ids, matrix) where matrix[i][j] is the average IoU over audios both annotated.
@@ -197,8 +207,9 @@ def compute_pairwise_average_tiou(annotation_dict: Dict[str, List[Dict[str, Any]
 
     return annotator_ids, M
 
+
 def compute_pairwise_mean_abs_duration_diff(
-    annotation_dict: Dict[str, List[Dict[str, Any]]]
+        annotation_dict: Dict[str, List[Dict[str, Any]]]
 ) -> Tuple[List[str], List[List[Optional[float]]], List[List[Optional[float]]], List[List[int]]]:
     """
     For each audio annotated by both annotators i and j:
@@ -244,16 +255,16 @@ def compute_pairwise_mean_abs_duration_diff(
                 Dj = durations[aj]
                 d = abs(Di - Dj)
                 ii, jj = idx[ai], idx[aj]
-                sum_abs[ii][jj]  += d
-                sumsq_abs[ii][jj]+= d * d
-                cnt[ii][jj]      += 1
+                sum_abs[ii][jj] += d
+                sumsq_abs[ii][jj] += d * d
+                cnt[ii][jj] += 1
                 if ii != jj:
-                    sum_abs[jj][ii]   += d
+                    sum_abs[jj][ii] += d
                     sumsq_abs[jj][ii] += d * d
-                    cnt[jj][ii]       += 1
+                    cnt[jj][ii] += 1
 
     meanM: List[List[Optional[float]]] = [[None for _ in range(n)] for _ in range(n)]
-    sdM:   List[List[Optional[float]]] = [[None for _ in range(n)] for _ in range(n)]
+    sdM: List[List[Optional[float]]] = [[None for _ in range(n)] for _ in range(n)]
 
     for i in range(n):
         for j in range(n):
@@ -261,7 +272,7 @@ def compute_pairwise_mean_abs_duration_diff(
                 m = sum_abs[i][j] / cnt[i][j]
                 meanM[i][j] = m
                 if cnt[i][j] > 1:
-                    var = max(0.0, (sumsq_abs[i][j] - cnt[i][j]*m*m) / (cnt[i][j]-1))
+                    var = max(0.0, (sumsq_abs[i][j] - cnt[i][j] * m * m) / (cnt[i][j] - 1))
                     sdM[i][j] = math.sqrt(var)
                 else:
                     sdM[i][j] = None
@@ -274,16 +285,17 @@ def compute_pairwise_mean_abs_duration_diff(
 
     return annotator_ids, meanM, sdM, cnt
 
+
 # ---------------- Plotting ----------------
 
 def plot_triangular_heatmap(
-    matrix: List[List[Optional[float]]],
-    labels: List[str],
-    title: str,
-    null_label: str = "NA",
-    value_format: str = "{:.2f}",
-    save_path: Optional[str] = None,
-    show: bool = True,
+        matrix: List[List[Optional[float]]],
+        labels: List[str],
+        title: str,
+        null_label: str = "NA",
+        value_format: str = "{:.2f}",
+        save_path: Optional[str] = None,
+        show: bool = True,
 ):
     """
     Render a bottom-left triangular heatmap (strictly lower triangle; diagonal excluded).
@@ -330,7 +342,7 @@ def plot_triangular_heatmap(
     text_data = np.ma.masked_invalid(arr)
 
     # Make the figure larger
-    fig, ax = plt.subplots(figsize=(10, 8)) # Increased figure size
+    fig, ax = plt.subplots(figsize=(10, 8))  # Increased figure size
 
     # Define a colormap for the heatmap.
     # We want the values in the lower triangle to have a color gradient,
@@ -339,23 +351,25 @@ def plot_triangular_heatmap(
     # We will ensure -1 maps to black.
     cmap = plt.cm.viridis
     cmap.set_bad(color='white')  # NaNs (unfilled cells in the lower triangle) will be white
-    cmap.set_under(color='black') # Values less than vmin will be black.
-                                  # We'll set vmin to 0 so -1 becomes black.
+    cmap.set_under(color='black')  # Values less than vmin will be black.
+    # We'll set vmin to 0 so -1 becomes black.
 
     # Determine the range for the actual data (excluding -1 and NaNs)
     valid_data = arr[~np.isnan(arr)]
     vmin = np.min(valid_data) if valid_data.size > 0 else 0
     vmax = np.max(valid_data) if valid_data.size > 0 else 1
 
-    im = ax.imshow(plot_data, interpolation="nearest", cmap=cmap, vmin=-0.5, vmax=vmax) # Adjusted vmin to ensure -1 is below the threshold
+    im = ax.imshow(plot_data, interpolation="nearest", cmap=cmap, vmin=-0.5,
+                   vmax=vmax)  # Adjusted vmin to ensure -1 is below the threshold
 
-    ax.set_title(title, fontsize=16) # Increased title font size
+    ax.set_title(title, fontsize=16)  # Increased title font size
     ax.set_xticks(np.arange(n))
     ax.set_yticks(np.arange(n))
 
     labels = [l.split("@")[0] for l in labels]  # quick way to get names
-    ax.set_xticklabels(labels, rotation=45, ha='right', fontsize=12) # Increased label font size and rotation for better readability
-    ax.set_yticklabels(labels, fontsize=12) # Increased label font size
+    ax.set_xticklabels(labels, rotation=45, ha='right',
+                       fontsize=12)  # Increased label font size and rotation for better readability
+    ax.set_yticklabels(labels, fontsize=12)  # Increased label font size
 
     # Add text annotations for strictly lower triangle only (exclude diagonal)
     for i in range(n):
@@ -371,12 +385,12 @@ def plot_triangular_heatmap(
                     text = ""
             else:
                 text = ""
-            ax.text(j, i, text, ha="center", va="center", color="black", fontsize=10) # Increased text font size
+            ax.text(j, i, text, ha="center", va="center", color="black", fontsize=10)  # Increased text font size
 
     fig.tight_layout()
 
     if save_path:
-        fig.savefig(save_path, bbox_inches="tight", dpi=300) # Increased DPI for higher resolution
+        fig.savefig(save_path, bbox_inches="tight", dpi=300)  # Increased DPI for higher resolution
     if show:
         plt.show()
     return fig, ax
@@ -392,7 +406,7 @@ def calculate_matrix_average(M: List[List[Optional[float]]]) -> Optional[float]:
     n = len(M)
     for i, row in enumerate(M):
         for j, item in enumerate(row):
-            if i == j:     # skip diagonal
+            if i == j:  # skip diagonal
                 continue
             if item is not None:
                 total += item
@@ -435,4 +449,3 @@ if __name__ == "__main__":
         save_path=None,
         show=True,
     )
-
