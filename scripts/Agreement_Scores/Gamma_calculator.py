@@ -28,24 +28,48 @@ def _canonical_combo_from_block(
         blank: str = "__NONE__",
 ) -> str:
     """
-    Turn a Labels Studio-like block into a canonical category token.
+    Build a canonical category token that can mix:
+      • Checkbox-style labels (True/False)
+      • Value-bearing fields: intended_word, produced_word, mispronunciation_ipa
 
-    Accepts either:
-      - {"labels":[...], "selected":[bool,...]}   (typical LS sub-dict), or
-      - {label_name: bool, ...}                   (already a map)
+    Examples:
+      - active checkboxes: "Correct+Orthographic Error"
+      - values present:    "produced_word=cat+mispronunciation_ipa=kæt"
+      - mixed:             "Correct+produced_word=cat"
 
-    Returns a string like "Correct+Orthographic Error" or "__NONE__".
+    Returns blank if nothing contributes.
     """
+    if not isinstance(block, dict):
+        return blank
+
+    # Normalize checkbox map if LS-style {"labels":[...], "selected":[...]}
     if "labels" in block and "selected" in block:
-        sel_map = dict(zip(block["labels"], block["selected"]))
+        sel_map = dict(zip(block.get("labels", []), block.get("selected", [])))
     else:
         sel_map = block
 
-    active = [name for name in target_values if sel_map.get(name, False)]
-    if not active:
+    special_value_keys = {"intended_word", "produced_word", "mispronunciation_ipa"}
+
+    # 1) Checkbox-style parts (exclude special value keys)
+    checkbox_parts = [
+        name for name in target_values
+        if name not in special_value_keys and bool(sel_map.get(name, False))
+    ]
+    checkbox_parts.sort()  # canonical order
+
+    # 2) Value-bearing parts (emit as key=value, only if non-empty)
+    value_parts = []
+    for key in sorted(k for k in target_values if k in special_value_keys):
+        if key in block:
+            val = block.get(key, None)
+            sval = "" if val is None else str(val).strip()
+            if sval:
+                value_parts.append(f"{key}={sval}")
+
+    parts = checkbox_parts + value_parts
+    if not parts:
         return blank
-    # Sorted order to guarantee identical tokens across annotators/audios
-    return "+".join(sorted(active))
+    return "+".join(parts)
 
 
 
@@ -536,37 +560,23 @@ if __name__ == "__main__":
 
     dicts = generate_combined_cross_annotation_dicts()
     data = dicts["all_cross_overlap"]
-
-
-    overall_m, overall_s, pair_m, pair_s, labels = compute_gamma_stats_for_dataset(
-        data_dict=data,
-        target_values=["Repair"],
-        subDictName="specific_label_type",
-    )
-
-    # Heatmap
-    plot_triangular_heatmap(pair_m, labels, "Pairwise γ (mean)")
-    plot_triangular_heatmap(pair_s, labels, "Pairwise γ (sd)")
-
-    json_out, audio_out = compute_all_gamma_summaries(data, max_workers=14)
-
-    # save JSON (annotator-wise summaries per combo)
-    with open("all_gamma_summaries.json", "w") as jf:
-        json.dump(json_out, jf)
-
-    # save TSV (per-audio γ per combo)
-    save_audiowise_tsv(audio_out, "gamma_per_audio.tsv")
-
+    
+    sample_link='https://2025storiza.michaelbennie.org/audio_clips/55.0_end_67.2_uid_eyem3EvRZrZsMzdS2HOEHLIsGTs1_sid_Gi6CTd0h6i7rPtveJk1O_1742516188.mp3'
+    
+    data_simplified = {
+        sample_link:
+            data[
+                sample_link]}
 
 
     # Grab one audio’s annotation list
-    audio_annotations = list(data.values())[0]
+    audio_annotations = data[sample_link]
 
     # Build per-annotator Continuum with canonical top-level combos
     continua_dict = generate_audio_continuua(
         audio_annotations,
-        target_values= ORTHO_SPEC,
-        subDictName="specific_label_type",
+        target_values= ["mispronunciation_ipa"],
+        subDictName=None,
         blank_label="__NONE__"
     )
 
@@ -579,6 +589,38 @@ if __name__ == "__main__":
     pairwise = calculate_pairwise_agreement(continua_dict.copy(), alpha=1.0, beta=1.0)
     for pair, g in sorted(pairwise.items(), key=lambda x: tuple(sorted(x[0]))):
         print(f"{sorted(list(pair))}: gamma={g:.3f}")
+
+
+
+
+
+    overall_m, overall_s, pair_m, pair_s, labels = compute_gamma_stats_for_dataset(
+        data_dict=data,
+        target_values= ["mispronunciation_ipa"],
+        subDictName=None,
+    )
+
+    # Heatmap
+    plot_triangular_heatmap(pair_m, labels, "Pairwise γ (mean)")
+    plot_triangular_heatmap(pair_s, labels, "Pairwise γ (sd)")
+
+
+
+    json_out, audio_out = compute_all_gamma_summaries(data, max_workers=1)
+
+    # save JSON (annotator-wise summaries per combo)
+    with open("all_gamma_summaries.json", "w") as jf:
+        json.dump(json_out, jf)
+
+    # save TSV (per-audio γ per combo)
+    save_audiowise_tsv(audio_out, "gamma_per_audio.tsv")
+
+    print("Data Saved")
+
+
+
+
+
 
 
 

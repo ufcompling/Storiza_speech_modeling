@@ -102,13 +102,6 @@ def _build_general_and_specific_for_region(region_items: List[Dict[str, Any]]) -
     for it in region_items:
         if it.get("type") == "choices":
             from_name = it.get("from_name")
-            selected = it.get("value", {}).get("choices", [])
-            for i in range(len(selected)):
-                if selected[i] in NAME_NORMALIZING_MAP:
-                    selected[i]=NAME_NORMALIZING_MAP[selected[i]]
-            for s in selected:
-                if s in specific_map:
-                    specific_map[s] = True
             family_to_top = {
                 "PhonologicalErrorType": "Phonological Error",
                 "OrthographicErrorType": "Orthographic Error",
@@ -118,11 +111,22 @@ def _build_general_and_specific_for_region(region_items: List[Dict[str, Any]]) -
                 "DisfluencyErrorType": "Disfluency Error",
             }
             fam = family_to_top.get(from_name)
-            if fam and "Mixed Error" not in top_level_selected and fam in general_map:
-                general_map[fam] = True
+            if fam and fam in top_level_selected:
+                selected = it.get("value", {}).get("choices", [])
+                for i in range(len(selected)):
+                    if selected[i] in NAME_NORMALIZING_MAP:
+                        selected[i]=NAME_NORMALIZING_MAP[selected[i]]
+                for s in selected:
+                    if s in specific_map:
+                        specific_map[s] = True
+                if "Mixed Error" not in top_level_selected and fam in general_map:
+                    general_map[fam] = True
+
+    if sum(value == True for value in general_map.values())>1:
+        raise GeneratorExit("Found multiple possible top-level label types for a non-mixed error label",general_map)
 
     for it in region_items:
-        if it.get("type") == "taxonomy" and it.get("from_name") == "MixedErrorTaxonomy":
+        if it.get("type") == "taxonomy" and it.get("from_name") == "MixedErrorTaxonomy" and "Mixed Error" in top_level_selected:
             tax = it.get("value", {}).get("taxonomy", [])
             for node in tax:
                 if not node:
@@ -342,19 +346,74 @@ def _transform_annotation(annotation: Dict[str, Any]) -> Dict[str, Any]:
             },
         }
 
+        general_true = [label for label, sel in
+                        zip(item_out["general_label_type"]['labels'], item_out["general_label_type"]['selected']) if
+                        sel]
+
+        # Filter specific labels
+        specific_true = [label for label, sel in
+                         zip(item_out["specific_label_type"]['labels'], item_out["specific_label_type"]['selected']) if
+                         sel]
+
+        # Combine them
+        category = general_true + specific_true
+
 
         iw = _merge_text(intended_words)
         pw = _merge_text(produced_words)
         ipa = _merge_text(ipa_vals)
         iws = _merge_text(intended_words_multi)
         if iw is not None:
-            item_out["intended_word"] = iw
+            valid_categories = [
+                "Whispering",
+                "Other",
+                "Phonological Error",
+                "Orthographic Error",
+                "Grammatical Error",
+                "Structural Error",
+                "Visual Tracking Error",
+                "Disfluency Error",
+                "Mixed Error",
+                "Correct"
+            ]
+            if category is not None and any(valid_cat in category for valid_cat in valid_categories):
+                item_out["intended_word"] = iw.lower().strip()
         if pw is not None:
-            item_out["produced_word"] = pw
-        if ipa is not None:
-            item_out["mispronunciation_ipa"] = clean_ipa([ipa])[0]
+            valid_categories = [
+                "Contraction/Shortening",
+                "Visual Tracking Error",
+                "Self Response",
+                "Other",
+                "Orthographic Error",
+                "Grammatical Error",
+                "Structural Error",
+                "Mixed Error"
+            ]
+            if category is not None and any(valid_cat in category for valid_cat in valid_categories):
+                item_out["produced_word"] = pw.lower().strip()
+
         if iws is not None:
-            item_out["intended_word"] = iws
+            valid_categories = ["Contraction/Shortening","Run-on"]
+            if category is not None and any(valid_cat in category for valid_cat in valid_categories):
+                item_out["intended_word"] = iws.lower().strip()
+
+
+
+
+        if "Correct" in category and "Disfluency Error" in category:
+            raise GeneratorExit("Found a mix of correct and other labels",category)
+
+
+        if "Contraction/Shortening" in category or "Phonological Error" in category or "Orthographic Error" in category or "Grammatical Error" in category or (
+                category == "Structural Error" and "Word Insertion" in category) or (
+                category == "Disfluency Error" and "Stutter" in category) or (
+                category == "Disfluency Error" and "Interjection" in category) or (
+                category == "Disfluency Error" and "Prolongation" in category) or (
+                category == "Disfluency Error" and "Broken Word" in category):
+            if ipa is not None:
+                item_out["mispronunciation_ipa"] = clean_ipa([ipa])[0]
+            else:
+                item_out["mispronunciation_ipa"] = "Missing IPA"
 
         simplified_items.append(item_out)
 
@@ -642,7 +701,7 @@ if __name__ == "__main__":
     generate_combined_cross_annotation_dicts(
         annotations_v2_json_path = "../../processed_annotations/export_194012_project-194012-at-2025-10-26-23-02-5adfae3c.json",
         annotations_v1_json_path = "../../processed_annotations/export_178326_project-178326-at-2025-09-29-04-04-8271fa09.json",
-        annotations_original_json_path = "../../processed_annotations/export_157618_project-157618-at-2025-10-26-23-01-53494ae5.json",
+        annotations_original_json_path = "../../processed_annotations/export_157618_project-157618-at-2025-11-04-20-59-65a08bb1.json",
     )
 
 

@@ -14,11 +14,12 @@ from krippendorff_unitized_alpha import (
 )
 
 from GenerateGroupedAnnotations import generate_combined_cross_annotation_dicts
-from Labels import TOP_LEVEL_LABELS, ORTHO_SPEC, GRAM_SPEC, STRUCT_SPEC, VISUAL_SPEC, RUNON_SPEC, FULL_COMBOS
+from Labels import TOP_LEVEL_LABELS, ORTHO_SPEC, GRAM_SPEC, STRUCT_SPEC, VISUAL_SPEC, RUNON_SPEC, FULL_COMBOS, \
+    TOP_LEVEL_ERROR_LABELS
 from calculate_alignment_scores import plot_triangular_heatmap
 
 
-# Reuse your extractor for LS-style blocks or value fields
+
 def _extract_category_token_for_alpha(
     label: Dict[str, Any],
     target_values: List[str],
@@ -300,7 +301,7 @@ if __name__ =="__main__":
 
     # Or one setting + heatmaps
     overall_m, overall_s, pair_m, pair_s, labels = compute_alpha_u_or_cu_stats_for_dataset(
-        data, ["Repair"], "specific_label_type"
+        data, ["mispronunciation_ipa"], None
     )
     print(overall_m,overall_s)
 

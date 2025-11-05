@@ -39,6 +39,27 @@ TOP_LEVEL_ERROR_LABELS = [
     "Other",
 ]
 
+CORRECT_RUNON_CONTRACTION = [
+    "Correct",
+    "Run-on",
+    "Contraction/Shortening",
+]
+
+
+TOP_LEVEL_ERROR_LABELS_MINUS_RUNON_CONTRACTION = [
+    "Phonological Error",
+    "Orthographic Error",
+    "Grammatical Error",
+    "Structural Error",
+    "Visual Tracking Error",
+    "Disfluency Error",
+    "Whispering",
+    "Unintelligible",
+    "Self Response",
+    "Other",
+]
+
+
 # Specific (error-type) labels
 PHONO_SPEC = [
     "Consonant Substitution",
@@ -153,7 +174,7 @@ SPECIFIC_TO_TOPLEVEL: Dict[str, str] = {
     "Interjection": "Disfluency Error",
     "Parent Correction": "Disfluency Error",
     "Parental Aid": "Disfluency Error",
-    "Run-on Word": "Disfluency Error",
+    #"Run-on Word": "Disfluency Error",
 }
 
 NAME_NORMALIZING_MAP={
@@ -164,6 +185,8 @@ NAME_NORMALIZING_MAP={
 FULL_COMBOS = [
     ("Top-level (general_label_type)", TOP_LEVEL_LABELS, "general_label_type"),
     ("Top-level (not including correct)", TOP_LEVEL_ERROR_LABELS, "general_label_type"),
+    ("Top-level (not including correct, run-on, or contractions)", TOP_LEVEL_ERROR_LABELS_MINUS_RUNON_CONTRACTION, "general_label_type"),
+    ("CORRECT+RUNONs+CONTRACTIONs", CORRECT_RUNON_CONTRACTION, "general_label_type"),
     #All Specific label combined toghether
     ("Phonological specifics combined", PHONO_SPEC, "specific_label_type"),
     ("Orthographic specifics combined", ORTHO_SPEC, "specific_label_type"),
